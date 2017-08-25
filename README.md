@@ -1,2 +1,3 @@
 # Reddit-plus-plus
-Reddit Api Wrapper for C++
+A work in development reddit api wrapper for C++
+Only dependency is curl.
