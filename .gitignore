@@ -30,3 +30,10 @@
 *.exe
 *.out
 *.app
+
+# Other Software Files
+*.pro
+*.pro.user
+
+# Ignore dependency files
+json.hpp

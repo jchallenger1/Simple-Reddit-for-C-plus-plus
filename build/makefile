@@ -23,5 +23,5 @@ clean :
 tar:
 	mkdir ._reddit++_; \
 	cp $(FILES) ._reddit++_; \
-	tar cfv main.tar ._reddit++_; \
+	tar cfv reddit++.tar ._reddit++_; \
 	rm -r ._reddit++_;
