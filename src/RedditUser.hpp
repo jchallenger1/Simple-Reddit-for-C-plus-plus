@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "HelperFunctions.hpp"
+
 namespace redd {
 
     class RedditUser {
@@ -11,26 +13,20 @@ namespace redd {
         RedditUser(const std::string& user ="", const std::string& pass = "", const std::string& ID = "", const std::string& secret = "")
             : username(user),password(pass),client_ID(ID),client_secret(secret) {}
 
+        template<typename T>
+        void setUser(T&& str);
 
-        void setUser(const char*);
-        void setUser(const std::string&);
-        void setUser(const std::string&&);
+        template<typename T>
+        void setPass(T&& str);
 
-        void setPass(const char*);
-        void setPass(const std::string&);
-        void setPass(const std::string&&);
+        template<typename T>
+        void setID(T&& str);
 
-        void setID(const char*);
-        void setID(const std::string&);
-        void setID(const std::string&&);
+        template<typename T>
+        void setSecret(T&& str);
 
-        void setSecret(const char*);
-        void setSecret(const std::string&);
-        void setSecret(const std::string&&);
-
-        void setToken(const char*);
-        void setToken(const std::string&);
-        void setToken(const std::string&&);
+        template<typename T>
+        void setToken(T&& str);
 
         operator bool() { return isComplete(); }
 
@@ -49,10 +45,43 @@ namespace redd {
         std::string client_ID;
         std::string client_secret;
         std::string access_token;
+
     };
 
     bool operator==(const RedditUser& lhs, const RedditUser& rhs);
     bool operator!=(const RedditUser& lhs, const RedditUser& rhs);
+
+
+
+    template<typename T>
+    void redd::RedditUser::setUser(T&& username_str) {
+        static_assert(redd::IsSupported<T>, "Object must be of type const char* or std::string");
+        username = std::forward<T>(username_str);
+    }
+
+    template<typename T>
+    void redd::RedditUser::setPass(T&& pass_str) {
+        static_assert(redd::IsSupported<T>, "Object must be of type const char* or std::string");
+        password = std::forward<T>(pass_str);
+    }
+
+    template<typename T>
+    void redd::RedditUser::setID(T&& ID_str) {
+        static_assert(redd::IsSupported<T>, "Object must be of type const char* or std::string");
+        client_ID = std::forward<T>(ID_str);
+    }
+
+    template<typename T>
+    void redd::RedditUser::setSecret(T&& secret_str) {
+        static_assert(redd::IsSupported<T>, "Object must be of type const char* or std::string");
+        client_secret = std::forward<T>(secret_str);
+    }
+
+    template<typename T>
+    void redd::RedditUser::setToken(T&& secret_str) {
+        static_assert(redd::IsSupported<T>, "Object must be of type const char* or std::string");
+        access_token = std::forward<T>(secret_str);
+    }
 
 
 }

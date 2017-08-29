@@ -44,7 +44,8 @@ std::string redd::Curl::requestToken(redd::RedditUser& user) {
     auto iter = json_obj.find("access_token");
     if (iter == json_obj.end()) {
         if (json_obj.find("message") != json_obj.end() && json_obj.find("error") != json_obj.end() ) {
-            throw RedditError("The server did not provide an access token.", curl_error, json_obj["error"] + " : " + json_obj["message"]);
+            std::string ser_err(json_obj.value("error","Unkown error code") +" : " + json_obj.value("message","Unkown error message"));
+            throw RedditError("The server did not provide an access token.", curl_error, ser_err);
         }
         else {
             throw RedditError("The server did not provide an access token.", curl_error);
