@@ -55,31 +55,31 @@ namespace redd {
 
     template<typename T>
     void redd::RedditUser::setUser(T&& username_str) {
-        static_assert(redd::IsSupported<T>, "Object must be of type const char* or std::string");
+        static_assert(redd::IsStrOrPtr<T>, "Object must be of type const char* or std::string");
         username = std::forward<T>(username_str);
     }
 
     template<typename T>
     void redd::RedditUser::setPass(T&& pass_str) {
-        static_assert(redd::IsSupported<T>, "Object must be of type const char* or std::string");
+        static_assert(redd::IsStrOrPtr<T>, "Object must be of type const char* or std::string");
         password = std::forward<T>(pass_str);
     }
 
     template<typename T>
     void redd::RedditUser::setID(T&& ID_str) {
-        static_assert(redd::IsSupported<T>, "Object must be of type const char* or std::string");
+        static_assert(redd::IsStrOrPtr<T>, "Object must be of type const char* or std::string");
         client_ID = std::forward<T>(ID_str);
     }
 
     template<typename T>
     void redd::RedditUser::setSecret(T&& secret_str) {
-        static_assert(redd::IsSupported<T>, "Object must be of type const char* or std::string");
+        static_assert(redd::IsStrOrPtr<T>, "Object must be of type const char* or std::string");
         client_secret = std::forward<T>(secret_str);
     }
 
     template<typename T>
     void redd::RedditUser::setToken(T&& secret_str) {
-        static_assert(redd::IsSupported<T>, "Object must be of type const char* or std::string");
+        static_assert(redd::IsStrOrPtr<T>, "Object must be of type const char* or std::string");
         access_token = std::forward<T>(secret_str);
     }
 

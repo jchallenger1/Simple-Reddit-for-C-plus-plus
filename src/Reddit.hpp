@@ -3,7 +3,8 @@
 
 #include <curl/curl.h>
 #include "Curl.hpp"
-#include "RedditBot.hpp"
+#include "HelperFunctions.hpp"
+#include "RedditSimpleClient.hpp"
 #include "RedditComment.hpp"
 #include "RedditCommentChain.hpp"
 #include "RedditMedia.hpp"

@@ -8,8 +8,9 @@ int main() {
     RedditUser x("throw12away323459","123321");
     x.setID(std::string("mkLIyes5Rt5PEg"));
     x.setSecret("QY7K4654Td_9KX3K4eWNQ4z4zL0");
-    Curl qw;
-    x.setToken(qw.requestToken(x));
+
+    RedditSimpleClient client;
+    x.setToken(client.requestToken(x));
     std::cout << x.token() << std::endl;
     return 0;
 }

@@ -6,15 +6,14 @@
 
 namespace redd {
     template<typename T>
-    struct IsSupported_IMPL : std::false_type {};
+    struct IsStrOrPtr_IMPL : std::false_type {};
     template<>
-    struct IsSupported_IMPL<std::string> : std::true_type {};
+    struct IsStrOrPtr_IMPL<std::string> : std::true_type {};
     template<>
-    struct IsSupported_IMPL<const char*> : std::true_type {};
+    struct IsStrOrPtr_IMPL<const char*> : std::true_type {};
 
     template<typename T>
-    constexpr bool IsSupported = IsSupported_IMPL<typename std::remove_reference< typename std::decay<T>::type >::type >::value;
-
+    constexpr bool IsStrOrPtr = IsStrOrPtr_IMPL<typename std::remove_reference< typename std::decay<T>::type >::type >::value;
 
 }
 
