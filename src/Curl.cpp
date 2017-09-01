@@ -9,19 +9,23 @@
 #include "Curl.hpp"
 #include "RedditError.hpp"
 
-redd::Curl::Curl() {
+namespace redd {
+
+
+
+Curl::Curl() {
     curl_global_init(CURL_GLOBAL_ALL);
     curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, curl_error);
 }
 
-redd::Curl::~Curl() {
+Curl::~Curl() {
     curl_easy_reset(curl);
     curl_easy_cleanup(curl);
     curl_global_cleanup();
 }
 
-std::string redd::Curl::simplePost(const std::string& url, const redd::RedditUser& user, const std::string post_fields) {
+std::string Curl::simplePost(const std::string& url, const redd::RedditUser& user, const std::string post_fields) {
 
     std::string result;
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -41,7 +45,7 @@ std::string redd::Curl::simplePost(const std::string& url, const redd::RedditUse
     return result;
 }
 
-std::string redd::Curl::simpleGet(const std::string &url) {
+std::string Curl::simpleGet(const std::string &url) {
     if (url.empty()) {
         throw RedditError("Given url is empty.");
     }
@@ -57,21 +61,23 @@ std::string redd::Curl::simpleGet(const std::string &url) {
     return result;
 }
 
-std::string redd::Curl::curlErrors() const {
+std::string Curl::curlErrors() const {
     return curl_error;
 }
 
-void redd::Curl::emptyErrors() {
+void Curl::emptyErrors() {
     memset(curl_error,0,sizeof(curl_error));
 }
 
 
-size_t redd::Curl::writeToFile(void *buffer, size_t size, size_t nmemb, std::ofstream *userp) {
+size_t Curl::writeToFile(void *buffer, size_t size, size_t nmemb, std::ofstream *userp) {
     userp->write(reinterpret_cast<char*>(buffer), size * nmemb);
     return size * nmemb;
 }
 
-size_t redd::Curl::writeToString(void *buffer, size_t size, size_t nmemb, std::string *userp) {
+size_t Curl::writeToString(void *buffer, size_t size, size_t nmemb, std::string *userp) {
     userp->append(reinterpret_cast<char*>(buffer), size * nmemb);
     return size * nmemb;
 }
+
+} //! redd namespace

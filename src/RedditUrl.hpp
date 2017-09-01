@@ -5,12 +5,15 @@
 #include <string>
 #include <vector>
 
+#include "HelperFunctions.hpp"
+
 namespace redd {
+
     /* An interface to deal with various types of reddit urls and a way to process them */
-    class RedditUrl {
-    public:
+class RedditUrl {
+public:
     RedditUrl() = delete;
-    RedditUrl(const string&) : given_url(url), base_url(stripUrl(url)), return_url(url) {}
+    RedditUrl(const std::string& url) : given_url(url), base_url(stripUrl(url)), return_url(url) {}
     ~RedditUrl() = default;
     RedditUrl(const RedditUrl&) = default;
     RedditUrl& operator =(const RedditUrl&) = default;
@@ -32,6 +35,8 @@ namespace redd {
     std::string based_url() const;
     std::string raw_url() const;
 
+    explicit operator std::string();/* TODO */
+
     bool isSubreddit() const; // determines if managed url has a subreddit embeded
 
     void resetToBase(); // resets the url without query strings
@@ -43,8 +48,12 @@ namespace redd {
     /* TODO: add implementation
      * TODO: add functionality for std::pair of a container and a string or const char of a container
     */
+
     template<typename T>
-    void addQueryStrings(T&& container);
+    void addQueryString(const T&& str);
+
+    template<typename T>
+    void addQueryStrings(const T&& container);
 
     template<typename Iter>
     void addQueryStrings(const Iter&& begin, const Iter&& end);
@@ -52,15 +61,39 @@ namespace redd {
 
 
 
-    private:
+private:
         const std::string given_url; // the url passed into the constructor
-        const std::string base_url; // stripped down url to either the subreddit or the frontpage
+        const std::string base_url; // stripped down url to either the subreddit or the frontpage in the format ...reddit.com/r/.../ or ...reddit.com/
         std::string return_url; // the url processed by the class
         std::string stripUrl(const string& url) const;
-    };
+};
 
-    std::ostream& operator<<(std::ostream&, const RedditUrl& url);
+std::ostream& operator<<(std::ostream&, const RedditUrl& url);
+
+
+template<typename T>
+void RedditUrl::addQueryString(const T&& str) {
+    static_assert(redd::IsStrOrPtr<T>, "Underlying type of container must be of std::string or const char*");
+    return_url += str;
 }
+
+template<typename T>
+void RedditUrl::addQueryStrings(const T&& container) {
+    static_assert( redd::IsStrOrPtr<typename T::value_type>, "Underlying type of container must be of std::string or const char*");
+    addQueryStrings(std::begin(std::forward<T>(container)), std::end(std::forward<T>(container)));
+}
+
+
+template<typename Iter>
+void RedditUrl::addQueryStrings(const Iter&& begin, const Iter&& end) {
+    static_assert(std::iterator_traits<Iter>::value_type, "Underlying type of container must be of std::string or const char*");
+    while (begin != end) {
+        addQueryString(*std::forward<Iter>(begin++));
+    }
+}
+
+
+} // !redd namespace
 
 
 #endif

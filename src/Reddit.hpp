@@ -6,7 +6,7 @@
  * Add comments to explain
  * Implement RedditMedia, RedditSub, RedditComment
  * Add classes or implementations to represent interior and exterior(on subreddit) posts
- *
+ * Hide implementation classes and functions.
  */
 
 #include <curl/curl.h>

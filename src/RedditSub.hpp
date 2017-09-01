@@ -3,13 +3,15 @@
 
 namespace redd {
     /* Interface to interact and use information from Reddit Subreddits. */
-    class RedditSub {
-    public:
+class RedditSub {
+public:
 
-    private:
+private:
 
-    };
-}
+};
+
+
+}//! redd namespace
 
 
 

@@ -15,17 +15,17 @@
 namespace redd {
 
 
-    /* Class to interact with the Reddit Api
-     * without the need of authentication.
-     */
-    class RedditSimpleClient {
-    public:
+/* Class to interact with the Reddit Api
+* without the need of authentication.
+*/
+class RedditSimpleClient {
+public:
 
-        std::string requestToken(const redd::RedditUser& user);
-        redd::RedditSub subreddit();
-    private:
-        redd::Curl curl;
-    };
+    std::string requestToken(const redd::RedditUser& user);
+    RedditSub subreddit();
+private:
+    Curl curl;
+};
 
 }
 

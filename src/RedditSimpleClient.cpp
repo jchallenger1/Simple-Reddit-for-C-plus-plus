@@ -6,7 +6,9 @@
 #include "Curl.hpp"
 
 
-std::string redd::RedditSimpleClient::requestToken(const redd::RedditUser& user) {
+namespace redd {
+
+std::string RedditSimpleClient::requestToken(const RedditUser& user) {
     curl.emptyErrors(); // make sure the errors are from this session
     std::string post_fields("grant_type=password&username=" + user.user() + "&password=" + user.pass());
     std::string token = curl.simplePost("https://www.reddit.com/api/v1/access_token", user, post_fields);
@@ -31,3 +33,6 @@ std::string redd::RedditSimpleClient::requestToken(const redd::RedditUser& user)
     return json_obj["access_token"];
 
 }
+
+
+} //! redd namespace
