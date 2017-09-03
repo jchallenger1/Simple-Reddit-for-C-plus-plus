@@ -2,6 +2,7 @@
 #include <regex>
 #include <exception>
 #include <iostream>
+#include <algorithm>
 
 #include "RedditUrl.hpp"
 #include "RedditError.hpp"
@@ -12,18 +13,22 @@ namespace redd {
 
 RedditUrl& RedditUrl::operator +=(const std::string str) {
     return_url += str;
+    return *this;
 }
 
 RedditUrl& RedditUrl::operator +=(const char* str) {
     return_url += str;
+    return *this;
 }
 
 RedditUrl& RedditUrl::operator =(const std::string str) {
     return_url = str;
+    return *this;
 }
 
 RedditUrl& RedditUrl::operator =(const char* str) {
     return_url = str;
+    return *this;
 }
 
 char& RedditUrl::operator[](size_t index) {
@@ -88,8 +93,21 @@ void RedditUrl::resetToRaw() {
     return_url = given_url;
 }
 
-void RedditUrl::addJson() {
-
+void RedditUrl::addJson() {// add .json onto the url at end of the url in format /r/.../.json?...
+    bool has_json = std::regex_search(return_url, std::smatch(), std::regex("\\.json")); // make sure json isn't already there.
+    if (!has_json) {
+        auto ques_mark = std::find(return_url.begin(), return_url.end(), '?');
+        std::string json(".json");
+        if (ques_mark == return_url.end()) { // there are no query strings present
+            if (end_slash != return_url.end()-1) {
+                return_url.append("/");
+            }
+            return_url.append(json);
+        }
+        else { //there are query strings present
+            return_url.insert(ques_mark, json.begin(), json.end());
+        }
+    }
 }
 
 

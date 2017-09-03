@@ -2,9 +2,10 @@
 
 #include "json.hpp"
 
+#include "RedditSimpleClient.hpp"
 #include "RedditError.hpp"
 #include "Curl.hpp"
-
+#include "RedditSub.hpp"
 
 namespace redd {
 
@@ -13,12 +14,7 @@ std::string RedditSimpleClient::requestToken(const RedditUser& user) {
     std::string post_fields("grant_type=password&username=" + user.user() + "&password=" + user.pass());
     std::string token = curl.simplePost("https://www.reddit.com/api/v1/access_token", user, post_fields);
     nlohmann::json json_obj;
-    try {
-        json_obj = nlohmann::json::parse(token);
-    }
-    catch(const std::exception& err) {
-        throw RedditError("A problem occured when parsing, Json Error:|" + err.what() + "|");
-    }
+    parseStr(token, json_obj);
 
     auto iter = json_obj.find("access_token");
     if (iter == json_obj.end()) {
@@ -31,8 +27,17 @@ std::string RedditSimpleClient::requestToken(const RedditUser& user) {
         }
     }
     return json_obj["access_token"];
-
 }
 
+
+
+RedditSub RedditSimpleClient::subreddit(const RedditUrl url) {
+    curl.emptyErrors();
+    url.addJson();
+    std::string unparsed = curl.simpleGet(url.url());
+    nlohmann::json json_obj;
+    parseStr(unparsed, json_obj);
+    return RedditSub();
+}
 
 } //! redd namespace
