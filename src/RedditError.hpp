@@ -4,7 +4,6 @@
 #include <iostream>
 #include <exception>
 #include <string>
-#include <cstring>
 
 namespace redd {
 
@@ -23,22 +22,7 @@ private:
     std::string server_msg;
 };
 
-std::ostream& operator<<(std::ostream& os, const RedditError& err) {
-    std::string user = err.what();
-    std::string cur = err.curl_what();
-    std::string ser = err.server_what();
-        /* Print Errors with name */
-    if (!user.empty()) {
-        os << "User Error : " << main << (!cur.empty() || !ser.empty() ? "\n" : std::flush);
-    }
-    if (!cur.empty()) {
-        os << "Curl Error : " << cur << (!ser.empty() ? "\n" : std::flush);
-    }
-    if (!ser.empty()) {
-        os << "Server Error : " << ser << std::flush;
-    }
-    return os;
-}
+std::ostream& operator<<(std::ostream& os, const RedditError& err);
 
 }//! redd namespace
 

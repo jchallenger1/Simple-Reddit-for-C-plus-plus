@@ -54,7 +54,7 @@ std::string::const_iterator RedditUrl::cend() const noexcept {
 }
 
 
-std::string RedditUrl::stripUrl(const string &url) const {
+std::string RedditUrl::stripUrl(const std::string &url) const {
     std::string pattern("(https://)?(www.)?reddit.com(/r/.+?(?:/))");
     std::regex reg(pattern);
     std::smatch sm;
@@ -77,8 +77,8 @@ std::string RedditUrl::raw_url() const {
     return given_url;
 }
 
-bool RedditUrl::isSubreddit() const {
-/* TODO */
+RedditUrl::operator std::string() {
+    return return_url;
 }
 
 void RedditUrl::stripUrl() {
@@ -94,20 +94,30 @@ void RedditUrl::resetToRaw() {
 }
 
 void RedditUrl::addJson() {// add .json onto the url at end of the url in format /r/.../.json?...
-    bool has_json = std::regex_search(return_url, std::smatch(), std::regex("\\.json")); // make sure json isn't already there.
+    bool has_json = std::regex_search(return_url, std::regex("\\.json")); // make sure json isn't already there.
     if (!has_json) {
         auto ques_mark = std::find(return_url.begin(), return_url.end(), '?');
+        auto end_slash = std::find(return_url.rbegin(), return_url.rend(), '/').base();
         std::string json(".json");
-        if (ques_mark == return_url.end()) { // there are no query strings present
-            if (end_slash != return_url.end()-1) {
+        if (ques_mark == return_url.cend()) { // there are no query strings present
+            if (end_slash != return_url.cend()-1) {
                 return_url.append("/");
             }
             return_url.append(json);
         }
         else { //there are query strings present
-            return_url.insert(ques_mark, json.begin(), json.end());
+            return_url.insert(ques_mark, json.cbegin(), json.cend());
         }
     }
+}
+
+
+void RedditUrl::addQueryString(const std::string& str) {
+    /* Make sure there is a slash at the end. */
+    if (std::find(return_url.begin(), return_url.end(), '/') == return_url.end()) {
+        return_url += "/";
+    }
+    return_url += str;
 }
 
 
@@ -117,4 +127,4 @@ std::ostream& operator<<(std::ostream& os, const RedditUrl& url) {
 }
 
 
-}
+}//! namespace redd

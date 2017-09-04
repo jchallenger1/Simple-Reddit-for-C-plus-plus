@@ -10,7 +10,6 @@ int main() {
     x.setSecret("QY7K4654Td_9KX3K4eWNQ4z4zL0");
 
     RedditSimpleClient client;
-    x.setToken(client.requestToken(x));
-    std::cout << x.token() << std::endl;
+    RedditSub n = client.subreddit("reddit.com/r/learnprogramming");
     return 0;
 }

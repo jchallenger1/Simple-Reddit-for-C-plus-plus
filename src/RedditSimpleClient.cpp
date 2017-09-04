@@ -31,13 +31,26 @@ std::string RedditSimpleClient::requestToken(const RedditUser& user) {
 
 
 
-RedditSub RedditSimpleClient::subreddit(const RedditUrl url) {
-    curl.emptyErrors();
-    url.addJson();
-    std::string unparsed = curl.simpleGet(url.url());
+RedditSub RedditSimpleClient::subreddit(const RedditUrl& url) {
+    curl.emptyErrors(); // ensure errors are from this function
+    RedditUrl scoped_url(url);
+    scoped_url.addJson();
+    std::string unparsed = curl.simpleGet(scoped_url.url());
     nlohmann::json json_obj;
     parseStr(unparsed, json_obj);
+    std::cout << unparsed << std::endl; /* DEBUG */
     return RedditSub();
+}
+
+
+void RedditSimpleClient::parseStr(const std::string& str, nlohmann::json& json_obj) const {
+    try {
+        json_obj = nlohmann::json::parse(str);
+    }
+    catch(const std::exception& err) {
+        const std::string& what = err.what();
+        throw RedditError("A problem occured when parsing, Json Error:|" + what + "|");
+    }
 }
 
 } //! redd namespace

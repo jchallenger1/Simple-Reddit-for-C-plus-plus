@@ -5,6 +5,26 @@
 namespace redd {
 
 
+void RedditUser::setUser(const std::string& str) {
+    username = str;
+}
+
+void RedditUser::setPass(const std::string& str) {
+    password = str;
+}
+
+void RedditUser::setID(const std::string& str) {
+    client_ID = str;
+}
+
+void RedditUser::setSecret(const std::string& str) {
+    client_secret = str;
+}
+
+void RedditUser::setToken(const std::string& str) {
+    access_token = str;
+}
+
 
 std::string RedditUser::user() const {
     return username;

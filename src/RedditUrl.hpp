@@ -14,6 +14,7 @@ class RedditUrl {
 public:
     RedditUrl() = delete;
     RedditUrl(const std::string& url) : given_url(url), base_url(stripUrl(url)), return_url(url) {}
+    RedditUrl(const char* url) : given_url(url), base_url(stripUrl(url)), return_url(url) {}
     ~RedditUrl() = default;
     RedditUrl(const RedditUrl&) = default;
     RedditUrl& operator =(const RedditUrl&) = default;
@@ -37,20 +38,14 @@ public:
 
     explicit operator std::string();/* TODO */
 
-    bool isSubreddit() const; // determines if managed url has a subreddit embeded
-
     void resetToBase(); // resets the url without query strings
     void resetToRaw(); // resets the url to
 
     void stripUrl();
 
     void addJson();
-    /* TODO: add implementation
-     * TODO: add functionality for std::pair of a container and a string or const char of a container
-    */
 
-    template<typename T>
-    void addQueryString(const T&& str);
+    void addQueryString(const std::string& str);
 
     template<typename T>
     void addQueryStrings(const T&& container);
@@ -65,17 +60,10 @@ private:
         const std::string given_url; // the url passed into the constructor
         const std::string base_url; // stripped down url to either the subreddit or the frontpage in the format ...reddit.com/r/.../ or ...reddit.com/
         std::string return_url; // the url processed by the class
-        std::string stripUrl(const string& url) const;
+        std::string stripUrl(const std::string& url) const;
 };
 
 std::ostream& operator<<(std::ostream&, const RedditUrl& url);
-
-
-template<typename T>
-void RedditUrl::addQueryString(const T&& str) {
-    static_assert(redd::IsStrOrPtr<T>, "Underlying type of container must be of std::string or const char*");
-    return_url += str;
-}
 
 template<typename T>
 void RedditUrl::addQueryStrings(const T&& container) {
