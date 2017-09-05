@@ -8,8 +8,7 @@ int main() {
     RedditUser x("throw12away323459","123321");
     x.setID(std::string("mkLIyes5Rt5PEg"));
     x.setSecret("QY7K4654Td_9KX3K4eWNQ4z4zL0");
-
     RedditSimpleClient client;
-    RedditSub n = client.subreddit("reddit.com/r/learnprogramming");
+    std::cout << client.requestToken(x) << std::endl;
     return 0;
 }

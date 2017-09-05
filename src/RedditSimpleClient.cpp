@@ -38,8 +38,7 @@ RedditSub RedditSimpleClient::subreddit(const RedditUrl& url) {
     std::string unparsed = curl.simpleGet(scoped_url.url());
     nlohmann::json json_obj;
     parseStr(unparsed, json_obj);
-    std::cout << unparsed << std::endl; /* DEBUG */
-    return RedditSub();
+    return RedditSub(json_obj);
 }
 
 
