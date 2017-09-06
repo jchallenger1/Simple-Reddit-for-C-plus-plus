@@ -23,6 +23,8 @@ public:
 
     std::string requestToken(const redd::RedditUser& user);
     RedditSub subreddit(const RedditUrl& url);
+    //std::string subreddit(const RedditUrl& url, const std::string& (item to search for))
+
 private:
     Curl curl;
     void parseStr(const std::string& str, nlohmann::json&) const;
