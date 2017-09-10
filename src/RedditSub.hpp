@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "json.hpp"
 
@@ -10,18 +11,18 @@ namespace redd {
     /* Interface to interact and use information from Reddit Subreddits. */
 class RedditSub {
 public:
-    struct SimplePost; // A way to return data from json requests, this should be changed in the future
+    struct ExternalPost; // A way to return data from json requests, this should be changed in the future
     RedditSub(const std::string& unparsed_json);
     RedditSub(const nlohmann::json&);
     void fromStr(const std::string&);
     void fromJson(const nlohmann::json&);
-    std::vector<SimplePost> posts() const;
+    std::vector<ExternalPost> posts() const;
     bool hasData() const;
 private:
    nlohmann::json redd_json;
 };
 
-struct RedditSub::SimplePost {
+struct RedditSub::ExternalPost {
     std::vector<std::pair<std::string, std::pair<int,int> > > preview; //string is the url pair is the dimensions in (w)*(h)
     std::string after; // the id of the next pair of posts
     std::string author; // the id of the author
@@ -43,9 +44,11 @@ struct RedditSub::SimplePost {
     int num_comments;
     bool hidden;
     bool over_18;
-private:
-    //hashing variable to indicate if we have this entry already.
 };
+
+bool operator ==(const RedditSub::ExternalPost&, const RedditSub::ExternalPost&);
+
+bool operator !=(const RedditSub::ExternalPost&, const RedditSub::ExternalPost&);
 
 }//! redd namespace
 

@@ -14,14 +14,15 @@ int main() {
     x.setSecret("QY7K4654Td_9KX3K4eWNQ4z4zL0");
     RedditSimpleClient client;
     RedditSub learnprogram = client.subreddit("https://www.reddit.com/r/learnprogramming");
-    std::vector<RedditSub::SimplePost> posts;
+    std::vector<RedditSub::ExternalPost> posts;
     if (!learnprogram.hasData()) {
         std::cerr << "Error!!" << std::endl;
     }
     else {
-        const std::vector<RedditSub::SimplePost>& temp_posts = learnprogram.posts();
-        posts = temp_posts;
+        posts = learnprogram.posts();
     }
-    std::cout << posts[0].after << std::endl;
+    for (RedditSub::ExternalPost n : posts) {
+        std::cout << n.url << std::endl;
+    }
     return 0;
 }

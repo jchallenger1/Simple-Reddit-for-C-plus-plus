@@ -55,7 +55,7 @@ std::string::const_iterator RedditUrl::cend() const noexcept {
 
 
 std::string RedditUrl::stripUrl(const std::string &url) const {
-    std::string pattern("(https://)?(www.)?reddit.com(/r/.+?(?:/))");
+    std::string pattern("(https://)?(www.)?reddit.com(/r/.+?/)?");
     std::regex reg(pattern);
     std::smatch sm;
     bool found = std::regex_search(url, sm, reg);
