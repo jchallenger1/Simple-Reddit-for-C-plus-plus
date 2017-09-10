@@ -43,7 +43,7 @@ std::vector<RedditSub::ExternalPost> RedditSub::posts() const {
             // String values
             setIfNotNull(return_posts[index].after, redd_json["data"], "after", "");
             setIfNotNull(return_posts[index].author, obj, "author", "");
-            setIfNotNull(return_posts[index].before, redd_json["data"], "before", "");
+            setIfNotNull(return_posts[index].before, redd_json["data"], "before", "");//
             setIfNotNull(return_posts[index].id, obj, "id", "");
             setIfNotNull(return_posts[index].permalink, obj, "permalink", "");
             setIfNotNull(return_posts[index].selftext, obj, "selftext", "");
@@ -61,13 +61,44 @@ std::vector<RedditSub::ExternalPost> RedditSub::posts() const {
             setIfNotNull(return_posts[index].ups, obj, "ups", -1);
             setIfNotNull(return_posts[index].num_comments, obj, "num_comments", -1);
 
-            //Boolean values
+            // Boolean values
             setIfNotNull(return_posts[index].hidden, obj, "hidden", false);
             setIfNotNull(return_posts[index].over_18, obj, "over_18", false);
 
+            // get the previews
+            auto& previews = return_posts[index].preview;
+            previews.reserve(10);
+            if (obj.find("preview") != obj.end()) {
+                if (obj["preview"].find("images") != obj["preview"].end()) {
+                    if (!obj["preview"]["images"].empty()) {
+                        auto& images = obj["preview"]["images"][0];
+                        if (!images.empty() && images.find("source") != images.end()) {
+                            // add the main source preview
+                            auto& source = images["source"];
+                            std::string url; int width; int height;
+                            setIfNotNull(url, source, "url", "");
+                            setIfNotNull(width, source, "width", -1);
+                            setIfNotNull(height, source, "height", -1);
+                            previews.push_back(std::make_pair(url, std::make_pair(width, height)));
+                        }
+                        if (images.find("resolutions") != images.end()) {
+                            // add the non main previews
+                            for (auto res_iter = images["resolutions"].begin();
+                                 res_iter != images["resolutions"].end(); res_iter++) {
+                                std::string url; int width; int height;
+                                setIfNotNull(url, *res_iter, "url", "");
+                                setIfNotNull(width, *res_iter, "width", -1);
+                                setIfNotNull(height, *res_iter, "height", -1);
+                                previews.push_back(std::make_pair(url, std::make_pair(width, height)));
+                            }
+                        }
+                    }
+                }
+            }
+
         } catch(std::exception& err) {
             const std::string& a = err.what();
-            throw RedditError("Error thrown setting RedditSub object, error |" + a + "|");
+            throw RedditError("Error thrown setting RedditSub object, error : |" + a + "|");
         }
     }
     return return_posts;

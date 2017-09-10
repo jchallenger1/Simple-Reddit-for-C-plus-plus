@@ -46,6 +46,7 @@ struct RedditSub::ExternalPost {
     bool over_18;
 };
 
+
 bool operator ==(const RedditSub::ExternalPost&, const RedditSub::ExternalPost&);
 
 bool operator !=(const RedditSub::ExternalPost&, const RedditSub::ExternalPost&);

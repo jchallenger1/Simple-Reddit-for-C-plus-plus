@@ -17,6 +17,8 @@ namespace redd {
 
 /* Class to interact with the Reddit Api
 * without the need of authentication.
+* This is mostly done through manipulating
+* reddit urls and adding .json to the requests.
 */
 class RedditSimpleClient {
 public:

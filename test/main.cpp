@@ -9,11 +9,9 @@ using namespace redd;
 
 
 int main() {
-    RedditUser x("throw12away323459","123321");
-    x.setID(std::string("mkLIyes5Rt5PEg"));
-    x.setSecret("QY7K4654Td_9KX3K4eWNQ4z4zL0");
+    /*   Example get redirect link from /r/pics   */
     RedditSimpleClient client;
-    RedditSub learnprogram = client.subreddit("https://www.reddit.com/r/learnprogramming");
+    RedditSub learnprogram = client.subreddit("https://www.reddit.com/r/pics");
     std::vector<RedditSub::ExternalPost> posts;
     if (!learnprogram.hasData()) {
         std::cerr << "Error!!" << std::endl;
@@ -21,8 +19,11 @@ int main() {
     else {
         posts = learnprogram.posts();
     }
-    for (RedditSub::ExternalPost n : posts) {
-        std::cout << n.url << std::endl;
+    std::vector<std::string>> download_links;
+    for (RedditSub::ExternalPost& n : posts) {
+        if (!n.permalink.empty()) {
+            download_links.emplace_back(n.permalink);
+        }
     }
     return 0;
 }

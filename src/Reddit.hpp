@@ -18,7 +18,6 @@
 #include "HelperFunctions.hpp"
 #include "RedditSimpleClient.hpp"
 #include "RedditComment.hpp"
-#include "RedditMedia.hpp"
 #include "RedditSub.hpp"
 #include "RedditUrl.hpp"
 #include "RedditUser.hpp"
