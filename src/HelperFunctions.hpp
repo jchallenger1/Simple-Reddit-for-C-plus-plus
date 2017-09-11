@@ -6,6 +6,7 @@
 
 namespace redd {
 
+namespace detail {
 
 template<typename T>
 struct IsStrOrPtr_IMPL : std::false_type {};
@@ -49,6 +50,7 @@ constexpr auto isNotNull(const T& obj) noexcept(noexcept(std::declval<T>().is_nu
 }
 */
 
+} //! detail namespace
 
 } //! redd namespace
 

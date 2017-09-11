@@ -30,6 +30,6 @@ std::ostream& operator<<(std::ostream& os, const RedditError& err) {
     return os;
 }
 
-}
+} //! redd namespace
 
 

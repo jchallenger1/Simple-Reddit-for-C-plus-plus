@@ -11,7 +11,7 @@
 
 namespace redd {
 
-
+namespace detail {
 
 Curl::Curl() {
     curl_global_init(CURL_GLOBAL_ALL);
@@ -25,12 +25,12 @@ Curl::~Curl() {
     curl_global_cleanup();
 }
 
-std::string Curl::simplePost(const std::string& url, const redd::RedditUser& user, const std::string post_fields) {
+std::string Curl::simplePost(const std::string& url, const RedditUser& user, const std::string post_fields) {
 
     std::string result;
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &result);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &redd::Curl::writeToString);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &Curl::writeToString);
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, curl_error);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_fields.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
@@ -52,7 +52,7 @@ std::string Curl::simpleGet(const std::string &url) {
     std::string result;
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &result);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &redd::Curl::writeToString);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &Curl::writeToString);
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, curl_error);
     auto response = curl_easy_perform(curl);
     if (response != CURLE_OK || result.empty()) {
@@ -79,5 +79,7 @@ size_t Curl::writeToString(void *buffer, size_t size, size_t nmemb, std::string 
     userp->append(reinterpret_cast<char*>(buffer), size * nmemb);
     return size * nmemb;
 }
+
+} //! detail namespace
 
 } //! redd namespace

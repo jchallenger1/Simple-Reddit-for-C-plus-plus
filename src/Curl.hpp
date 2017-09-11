@@ -9,6 +9,8 @@
 
 namespace redd {
 
+namespace detail {
+
 class Curl {
 public:
     Curl();
@@ -26,7 +28,9 @@ private:
 
 };
 
-}
+} //! detail namespace
+
+} //! redd namespace
 
 
 #endif

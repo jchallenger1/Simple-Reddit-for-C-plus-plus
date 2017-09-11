@@ -28,7 +28,7 @@ public:
     //std::string subreddit(const RedditUrl& url, const std::string& (item to search for))
 
 private:
-    Curl curl;
+    detail::Curl curl;
     void parseStr(const std::string& str, nlohmann::json&) const;
 };
 

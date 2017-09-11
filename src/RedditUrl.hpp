@@ -67,21 +67,23 @@ std::ostream& operator<<(std::ostream&, const RedditUrl& url);
 
 template<typename T>
 void RedditUrl::addQueryStrings(const T&& container) {
-    static_assert( redd::IsStrOrPtr<typename T::value_type>, "Underlying type of container must be of std::string or const char*");
+    static_assert( detail::IsStrOrPtr<typename T::value_type>,
+                   "Underlying type of container must be of std::string or const char*");
     addQueryStrings(std::begin(std::forward<T>(container)), std::end(std::forward<T>(container)));
 }
 
 
 template<typename Iter>
 void RedditUrl::addQueryStrings(const Iter&& begin, const Iter&& end) {
-    static_assert(std::iterator_traits<Iter>::value_type, "Underlying type of container must be of std::string or const char*");
+    static_assert( detail::IsStrOrPtr<typename std::iterator_traits<Iter>::value_type>,
+                   "Underlying type of container must be of std::string or const char*");
     while (begin != end) {
         addQueryString(*std::forward<Iter>(begin++));
     }
 }
 
 
-} // !redd namespace
+} //! redd namespace
 
 
 #endif

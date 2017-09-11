@@ -127,4 +127,4 @@ std::ostream& operator<<(std::ostream& os, const RedditUrl& url) {
 }
 
 
-}//! namespace redd
+}//! redd namespace

@@ -19,11 +19,12 @@ int main() {
     else {
         posts = learnprogram.posts();
     }
-    std::vector<std::string>> download_links;
+    std::vector<std::string> download_links;
     for (RedditSub::ExternalPost& n : posts) {
         if (!n.permalink.empty()) {
             download_links.emplace_back(n.permalink);
         }
     }
+    std::cout << download_links.size() << std::endl;
     return 0;
 }

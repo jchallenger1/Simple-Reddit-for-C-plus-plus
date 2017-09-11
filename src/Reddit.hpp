@@ -23,6 +23,6 @@
 #include "RedditUser.hpp"
 
 namespace redd {}
-
+namespace detail {}
 
 #endif

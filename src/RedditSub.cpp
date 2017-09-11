@@ -41,6 +41,7 @@ std::vector<RedditSub::ExternalPost> RedditSub::posts() const {
        try {
             auto& obj = (*post_begin)["data"];
             // String values
+            using detail::setIfNotNull;
             setIfNotNull(return_posts[index].after, redd_json["data"], "after", "");
             setIfNotNull(return_posts[index].author, obj, "author", "");
             setIfNotNull(return_posts[index].before, redd_json["data"], "before", "");//
@@ -119,4 +120,4 @@ bool operator !=(const RedditSub::ExternalPost& lhs, const RedditSub::ExternalPo
     return !(lhs == rhs);
 }
 
-} //! namespace redd
+} //! redd namespace
