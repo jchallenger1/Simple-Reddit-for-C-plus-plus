@@ -65,6 +65,10 @@ std::string RedditUrl::stripUrl(const std::string &url) const {
     return sm.str();
 }
 
+RedditUrl::operator std::string() {
+    return return_url;
+}
+
 std::string RedditUrl::url() const {
     return return_url;
 }
@@ -75,10 +79,6 @@ std::string RedditUrl::based_url() const {
 
 std::string RedditUrl::raw_url() const {
     return given_url;
-}
-
-RedditUrl::operator std::string() {
-    return return_url;
 }
 
 void RedditUrl::stripUrl() {
@@ -113,11 +113,35 @@ void RedditUrl::addJson() {// add .json onto the url at end of the url in format
 
 
 void RedditUrl::addQueryString(const std::string& str) {
-    /* Make sure there is a slash at the end. */
-    if (std::find(return_url.begin(), return_url.end(), '/') == return_url.end()) {
-        return_url += "/";
+    auto ques_mark = std::find(return_url.begin(), return_url.end(), '?');
+    if (ques_mark != return_url.end()) { // there are query strings already present
+        // if it does not have a &, add one.
+        auto and_char = std::find(str.cbegin(), str.cend(), '&');
+        if (and_char != str.cend() && and_char == str.crbegin().base()) {
+            // if there is a & at the end, remove it, & at the beginning is fine, otherwise assume multiple query strings.
+            return_url.insert(str.cbegin(), str.cend()-1);
+        }
+        else if(and_char == str.cbegin()){
+            return_url += str;
+        }
+        else {
+            return_url += "&" + str;
+        }
     }
-    return_url += str;
+    else {
+        auto and_char = std::find(str.cbegin(), str.cend(), '&');
+        if (and_char == str.cbegin()) {
+            return_url += "?" + std::string(str.cbegin()+1, str.cend() );
+        }
+        else {
+            return_url += "?" + str;
+        }
+    }
+
+    // remove trailing &
+    if (*(return_url.cend()-1) == '&') {
+        return_url.erase(return_url.cend()-1,1);
+    }
 }
 
 

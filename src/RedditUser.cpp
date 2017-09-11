@@ -22,6 +22,8 @@ void RedditUser::setSecret(const std::string& str) {
 }
 
 void RedditUser::setToken(const std::string& str) {
+    // every hour the user must get another token.
+    time_token = std::chrono::system_clock::now() + std::chrono::hours(1);
     access_token = str;
 }
 

@@ -36,7 +36,7 @@ public:
     std::string based_url() const;
     std::string raw_url() const;
 
-    explicit operator std::string();/* TODO */
+    explicit operator std::string();
 
     void resetToBase(); // resets the url without query strings
     void resetToRaw(); // resets the url to
@@ -48,13 +48,10 @@ public:
     void addQueryString(const std::string& str);
 
     template<typename T>
-    void addQueryStrings(const T&& container);
+    void addQueryStrings(T&& container);
 
     template<typename Iter>
-    void addQueryStrings(const Iter&& begin, const Iter&& end);
-
-
-
+    void addQueryStrings(Iter&& begin, Iter&& end);
 
 private:
         const std::string given_url; // the url passed into the constructor
@@ -66,7 +63,7 @@ private:
 std::ostream& operator<<(std::ostream&, const RedditUrl& url);
 
 template<typename T>
-void RedditUrl::addQueryStrings(const T&& container) {
+void RedditUrl::addQueryStrings(T&& container) {
     static_assert( detail::IsStrOrPtr<typename T::value_type>,
                    "Underlying type of container must be of std::string or const char*");
     addQueryStrings(std::begin(std::forward<T>(container)), std::end(std::forward<T>(container)));
@@ -74,7 +71,7 @@ void RedditUrl::addQueryStrings(const T&& container) {
 
 
 template<typename Iter>
-void RedditUrl::addQueryStrings(const Iter&& begin, const Iter&& end) {
+void RedditUrl::addQueryStrings(Iter&& begin, Iter&& end) {
     static_assert( detail::IsStrOrPtr<typename std::iterator_traits<Iter>::value_type>,
                    "Underlying type of container must be of std::string or const char*");
     while (begin != end) {
