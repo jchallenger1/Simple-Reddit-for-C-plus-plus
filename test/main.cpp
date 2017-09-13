@@ -6,8 +6,6 @@
 #include "../src/Reddit.hpp"
 using namespace redd;
 
-
-
 int main() {
     /*   Example get redirect link from /r/pics   */
     RedditSimpleClient client;

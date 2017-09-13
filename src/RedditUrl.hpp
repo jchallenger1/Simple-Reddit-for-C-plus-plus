@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <initializer_list>
 
 #include "HelperFunctions.hpp"
 
@@ -17,6 +18,7 @@ public:
     RedditUrl(const char* url) : given_url(url), base_url(stripUrl(url)), return_url(url) {}
     ~RedditUrl() = default;
     RedditUrl(const RedditUrl&) = default;
+
     RedditUrl& operator =(const RedditUrl&) = default;
 
     RedditUrl& operator +=(const std::string);
@@ -50,6 +52,9 @@ public:
     template<typename T>
     void addQueryStrings(T&& container);
 
+    template<typename T>
+    void addQueryStrings(std::initializer_list<T>&& list);
+
     template<typename Iter>
     void addQueryStrings(Iter&& begin, Iter&& end);
 
@@ -60,20 +65,29 @@ private:
         std::string stripUrl(const std::string& url) const;
 };
 
+/* Functions */
 std::ostream& operator<<(std::ostream&, const RedditUrl& url);
 
+
+/*  Templates */
 template<typename T>
 void RedditUrl::addQueryStrings(T&& container) {
-    static_assert( detail::IsStrOrPtr<typename T::value_type>,
-                   "Underlying type of container must be of std::string or const char*");
+    static_assert(detail::IsStrOrPtr<typename T::value_type>,
+                   "Underlying type of container must be of type std::string or const char*");
     addQueryStrings(std::begin(std::forward<T>(container)), std::end(std::forward<T>(container)));
 }
 
+template<typename T>
+void RedditUrl::addQueryStrings(std::initializer_list<T>&& list) {
+    using list_t = std::initializer_list<T>;
+    static_assert(detail::IsStrOrPtr<T>, "Underlying type of container must be of type std::string or const char*");
+    addQueryStrings(std::begin(std::forward<list_t>(list)), std::end(std::forward<list_t>(list)));
+}
 
 template<typename Iter>
 void RedditUrl::addQueryStrings(Iter&& begin, Iter&& end) {
-    static_assert( detail::IsStrOrPtr<typename std::iterator_traits<Iter>::value_type>,
-                   "Underlying type of container must be of std::string or const char*");
+    static_assert(detail::IsStrOrPtr<typename std::iterator_traits<Iter>::value_type>,
+                   "Underlying type of container must be of type std::string or const char*");
     while (begin != end) {
         addQueryString(*std::forward<Iter>(begin++));
     }

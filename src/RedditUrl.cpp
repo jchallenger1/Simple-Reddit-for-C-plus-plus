@@ -10,7 +10,6 @@
 namespace redd {
 
 
-
 RedditUrl& RedditUrl::operator +=(const std::string str) {
     return_url += str;
     return *this;
@@ -117,9 +116,9 @@ void RedditUrl::addQueryString(const std::string& str) {
     if (ques_mark != return_url.end()) { // there are query strings already present
         // if it does not have a &, add one.
         auto and_char = std::find(str.cbegin(), str.cend(), '&');
+        // if there is a & at the end, remove it, & at the beginning is fine, otherwise assume multiple query strings.
         if (and_char != str.cend() && and_char == str.crbegin().base()) {
-            // if there is a & at the end, remove it, & at the beginning is fine, otherwise assume multiple query strings.
-            return_url.insert(str.cbegin(), str.cend()-1);
+            return_url.insert(return_url.end(), str.cbegin(), str.cend()-1);
         }
         else if(and_char == str.cbegin()){
             return_url += str;
@@ -128,7 +127,7 @@ void RedditUrl::addQueryString(const std::string& str) {
             return_url += "&" + str;
         }
     }
-    else {
+    else { // there are no query strings
         auto and_char = std::find(str.cbegin(), str.cend(), '&');
         if (and_char == str.cbegin()) {
             return_url += "?" + std::string(str.cbegin()+1, str.cend() );
@@ -140,7 +139,7 @@ void RedditUrl::addQueryString(const std::string& str) {
 
     // remove trailing &
     if (*(return_url.cend()-1) == '&') {
-        return_url.erase(return_url.cend()-1,1);
+        return_url.erase(return_url.cend()-1);
     }
 }
 

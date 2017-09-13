@@ -14,6 +14,8 @@ template<>
 struct IsStrOrPtr_IMPL<std::string> : std::true_type {};
 template<>
 struct IsStrOrPtr_IMPL<const char*> : std::true_type {};
+template<>
+struct IsStrOrPtr_IMPL<char*> : std::true_type {};
 
 template<typename T>
 constexpr bool IsStrOrPtr = IsStrOrPtr_IMPL<
