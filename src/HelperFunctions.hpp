@@ -26,10 +26,19 @@ constexpr bool IsStrOrPtr = IsStrOrPtr_IMPL<
                                 >::type
                             >::value;
 
+// Returns a bool if T is of type std::string.
+template<typename T>
+constexpr bool IsStr = std::is_same<
+                            typename std::remove_const<
+                                typename std::remove_reference<T>::type
+                            >::type,
+                        std::string>::value;
+
 /*
  * Get value from json_obj(of type nhloman::basic_json) and writes to output;
  * writes default_value to output if errors.
- * Function acts as a wrapper for nhloman::basic_json::value function.
+ * Function acts as an exception safe
+ * wrapper for nhloman::basic_json::value function.
 */
 template<typename O, typename J, typename K, typename D>
 constexpr auto setIfNotNull(O&& output, const J& json_obj, K&& key_name, D&& default_value)
