@@ -24,8 +24,7 @@ class RedditSimpleClient {
 public:
 
     std::string requestToken(const redd::RedditUser& user);
-    RedditSub subreddit(const RedditUrl& url);
-    //std::string subreddit(const RedditUrl& url, const std::string& (item to search for))
+    RedditSub subreddit(const std::string& url);
 
 private:
     detail::Curl curl;

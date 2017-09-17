@@ -17,6 +17,8 @@ struct IsStrOrPtr_IMPL<const char*> : std::true_type {};
 template<>
 struct IsStrOrPtr_IMPL<char*> : std::true_type {};
 
+
+// Returns a bool if T is of type std::string, const char* or char*.
 template<typename T>
 constexpr bool IsStrOrPtr = IsStrOrPtr_IMPL<
                                 typename std::remove_reference<
@@ -25,8 +27,8 @@ constexpr bool IsStrOrPtr = IsStrOrPtr_IMPL<
                             >::value;
 
 /*
- * Function will assign the value to output only if
- *  the object_key is not null and it does exists
+ * Get value from json_obj(of type nhloman::basic_json) and writes to output;
+ * writes default_value to output if errors.
 */
 template<typename O, typename J, typename K, typename D>
 constexpr auto setIfNotNull(O&& output, const J& json_obj, K&& key_name, D&& default_value)
@@ -44,13 +46,6 @@ constexpr auto setIfNotNull(O&& output, const J& json_obj, K&& key_name, D&& def
         output = default_value;
     }
 }
-/*
-template<typename T>
-constexpr auto isNotNull(const T& obj) noexcept(noexcept(std::declval<T>().is_null()))
--> decltype(std::declval<T>().is_null(), bool()) {
-    return obj.is_null();
-}
-*/
 
 } //! detail namespace
 

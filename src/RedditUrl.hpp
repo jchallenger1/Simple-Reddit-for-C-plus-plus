@@ -14,8 +14,8 @@ namespace redd {
 class RedditUrl {
 public:
     RedditUrl() = delete;
-    RedditUrl(const std::string& url) : given_url(url), base_url(stripUrl(url)), return_url(url) {}
-    RedditUrl(const char* url) : given_url(url), base_url(stripUrl(url)), return_url(url) {}
+    RedditUrl(const std::string& url) : base_url(stripUrl(url)), return_url(url) {}
+    RedditUrl(const char* url) : base_url(stripUrl(url)), return_url(url) {}
     ~RedditUrl() = default;
     RedditUrl(const RedditUrl&) = default;
 
@@ -36,12 +36,10 @@ public:
 
     std::string url() const;
     std::string based_url() const;
-    std::string raw_url() const;
 
     explicit operator std::string();
 
     void resetToBase(); // resets the url without query strings
-    void resetToRaw(); // resets the url to
 
     void stripUrl();
 
@@ -59,7 +57,6 @@ public:
     void addQueryStrings(Iter&& begin, Iter&& end);
 
 private:
-        const std::string given_url; // the url passed into the constructor
         const std::string base_url; // stripped down url to either the subreddit or the frontpage in the format ...reddit.com/r/.../ or ...reddit.com/
         std::string return_url; // the url processed by the class
         std::string stripUrl(const std::string& url) const;
@@ -70,6 +67,10 @@ std::ostream& operator<<(std::ostream&, const RedditUrl& url);
 
 
 /*  Templates */
+
+/*
+ *  All addQueryStrings redirect the work to addQueryString.
+*/
 template<typename T>
 void RedditUrl::addQueryStrings(T&& container) {
     static_assert(detail::IsStrOrPtr<typename T::value_type>,

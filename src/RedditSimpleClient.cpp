@@ -33,7 +33,7 @@ std::string RedditSimpleClient::requestToken(const RedditUser& user) {
 
 
 
-RedditSub RedditSimpleClient::subreddit(const RedditUrl& url) {
+RedditSub RedditSimpleClient::subreddit(const std::string& url) {
     curl.emptyErrors(); // ensure errors are from this function
     RedditUrl scoped_url(url);
     scoped_url.addJson();

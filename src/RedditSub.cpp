@@ -56,6 +56,7 @@ std::vector<RedditSub::ExternalPost> RedditSub::posts() const {
             setIfNotNull(return_posts[index].url, obj, "url", "");
 
             // Number values
+            // type must be long long, the number from the object is be too big for smaller data types.
             setIfNotNull(return_posts[index].created_utc, obj, "created_utc", static_cast<long long>(-1));
             setIfNotNull(return_posts[index].gilded, obj, "gilded", -1);
             setIfNotNull(return_posts[index].downs, obj, "downs", -1);
@@ -110,7 +111,6 @@ bool RedditSub::hasData() const {
 }
 
 
-// Non member functions
 
 bool operator ==(const RedditSub::ExternalPost& lhs, const RedditSub::ExternalPost& rhs) {
     return lhs.url == rhs.url && lhs.id == rhs.id && lhs.author == rhs.author && lhs.subreddit_id == rhs.subreddit_id;

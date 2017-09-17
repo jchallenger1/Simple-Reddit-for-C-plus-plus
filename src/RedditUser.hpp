@@ -27,6 +27,7 @@ public:
 
     operator bool() { return isComplete(); }
 
+
     bool isFilled() const;
     bool isComplete() const;
 
@@ -35,9 +36,10 @@ public:
     std::string ID() const;
     std::string secret() const;
     std::string token() const;
+
+    // access_token is only valid for 1 hour, function determines if an hour has passed.
     template<typename DurationT = std::chrono::seconds>
     typename DurationT::rep timeLeft() const;
-
 private:
     std::string username;
     std::string password;

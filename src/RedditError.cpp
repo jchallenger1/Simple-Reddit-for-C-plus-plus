@@ -6,11 +6,11 @@
 
 namespace redd {
 
+// Print Errors from all sources separated by newlines.
 std::ostream& operator<<(std::ostream& os, const RedditError& err) {
-    std::string user = err.what();
-    std::string cur = err.curl_what();
-    std::string ser = err.server_what();
-        /* Print Errors with name */
+    const std::string& user = err.what();
+    const std::string& cur = err.curl_what();
+    const std::string& ser = err.server_what();
     if (!user.empty()) {
         os << "User Error : " << user;
         if (!cur.empty() || !ser.empty()) {

@@ -38,6 +38,7 @@ std::string Curl::simplePost(const std::string& url, const RedditUser& user, con
     curl_easy_setopt(curl, CURLOPT_USERPWD, auth.c_str());
     auto response = curl_easy_perform(curl);
 
+    // if a blank page was passed, it's most likely an error, the reddit endpoint atleast returns "{}".
     if (response != CURLE_OK || result.empty()) {
         throw RedditError("Curl was not able to make the request to the server.", curl_error);
     }
@@ -55,6 +56,8 @@ std::string Curl::simpleGet(const std::string &url) {
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &Curl::writeToString);
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, curl_error);
     auto response = curl_easy_perform(curl);
+
+    // if a blank page was passed, it's most likely an error, the reddit endpoint atleast returns "{}".
     if (response != CURLE_OK || result.empty()) {
         throw RedditError("Curl was not able to make the request to the server.", curl_error);
     }

@@ -76,20 +76,12 @@ std::string RedditUrl::based_url() const {
     return base_url;
 }
 
-std::string RedditUrl::raw_url() const {
-    return given_url;
-}
-
 void RedditUrl::stripUrl() {
     return_url = stripUrl(return_url);
 }
 
 void RedditUrl::resetToBase() {
     return_url = base_url;
-}
-
-void RedditUrl::resetToRaw() {
-    return_url = given_url;
 }
 
 void RedditUrl::addJson() {// add .json onto the url at end of the url in format /r/.../.json?...
