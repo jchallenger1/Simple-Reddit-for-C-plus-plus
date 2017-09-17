@@ -29,6 +29,7 @@ constexpr bool IsStrOrPtr = IsStrOrPtr_IMPL<
 /*
  * Get value from json_obj(of type nhloman::basic_json) and writes to output;
  * writes default_value to output if errors.
+ * Function acts as a wrapper for nhloman::basic_json::value function.
 */
 template<typename O, typename J, typename K, typename D>
 constexpr auto setIfNotNull(O&& output, const J& json_obj, K&& key_name, D&& default_value)
