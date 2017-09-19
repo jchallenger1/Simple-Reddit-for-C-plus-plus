@@ -13,13 +13,14 @@ namespace redd {
 
 namespace detail {
 
-Curl::Curl() {
+Curl::Curl() : header_list(nullptr), curl(nullptr) {
     curl_global_init(CURL_GLOBAL_ALL);
     curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, curl_error);
 }
 
 Curl::~Curl() {
+    curl_slist_free_all(header_list);
     curl_easy_reset(curl);
     curl_easy_cleanup(curl);
     curl_global_cleanup();
@@ -62,6 +63,26 @@ std::string Curl::simpleGet(const std::string &url) {
         throw RedditError("Curl was not able to make the request to the server.", curl_error);
     }
     return result;
+}
+
+void Curl::appendHeader(const std::string& str) {
+    if (std::find(str.cbegin(), str.cend(), ':') == str.cend()) {
+        throw std::runtime_error("Header must have a \':\' in the format \"Auth : 123 \"");
+    }
+    header_list = curl_slist_append(header_list, str.c_str());
+}
+
+void Curl::appendHeader(const char* str) {
+    auto ptr = strchr(str, ':');
+    if (ptr == nullptr || ptr == NULL) {
+        throw std::runtime_error("Header must have a \':\' in the format \"Auth : 123 \"");
+    }
+    header_list = curl_slist_append(header_list, str);
+}
+
+
+void Curl::emptyHttpHeader() {
+    curl_slist_free_all(header_list);
 }
 
 std::string Curl::curlErrors() const {

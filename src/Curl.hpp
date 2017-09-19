@@ -13,6 +13,7 @@
 
 #include "RedditUser.hpp"
 #include "RedditError.hpp"
+#include "HelperFunctions.hpp"
 
 namespace redd {
 
@@ -25,89 +26,73 @@ public:
     std::string simplePost(const std::string& url, const redd::RedditUser&, const std::string post_fields = ""); // creates a POST request to url
 
     std::string simpleGet(const std::string& url); // create a HTTP get request to url
-    // container and initalizer lists represent headers put
-    // with the request. A single entry is in the format "Auth : 123"
-    template<typename T>
-    std::enable_if_t<isStrOrPtr<T>, std::string>
-    simpleGet(const std::string& url, T&& str);
-    template<typename C>
-    std::enable_if_t<!isStrOrPtr<C>, std::string>
-    simpleGet(const std::string& url, C&& cont);
-    template<typename T>
-    std::string simpleGet(const std::string& url, std::initializer_list<T>&& list);
-    template<typename Iter>
-    std::string simpleGet(const std::string& url, const Iter&, const Iter&);
 
+    template<typename T>
+    void setHttpHeader(const T& str);
+
+    template<typename C>
+    void setHttpHeaders(const C& container);
+
+    template<typename T>
+    void setHttpHeaders(std::initializer_list<T>&& list);
+
+    template<typename Iter>
+    void setHttpHeaders(Iter begin, Iter end);
+
+    void emptyHttpHeader();
 
     std::string curlErrors() const; // returns errors from curl in a string
     void emptyErrors(); // removes all errors in the curl_error object
 private:
     static size_t writeToString(void* buffer, size_t size, size_t nmemb, std::string* userp); // writes bytes to string
     static size_t writeToFile(void* buffer, size_t size, size_t nmemb, std::ofstream* userp); // wrties bytes to file
-    template<typename T>
-    void setHttpHeader(const T&, curl_slist*&);
+    void appendHeader(const std::string&);
+    void appendHeader(const char*);
 
+
+    curl_slist* header_list;
     CURL* curl;// managed curl object
     char curl_error[CURL_ERROR_SIZE]; // buffer representing errors given from curl
 
 };
 
-
-// *** Templates *** //
 template<typename C>
-std::enable_if_t<!isStrOrPtr<C>, std::string>
-Curl::simpleGet(const std::string& url, C&& cont) {
+void Curl::setHttpHeaders(const C& container) {
     static_assert(IsStrOrPtr<typename C::value_type>,
                   "Underlying type of container must be of type std::string or const char*");
-    return simpleGet(url, std::begin(std::forward<C>(cont)), std::end(std::forward<C>(cont)));
+    setHttpHeaders(std::cbegin(container), std::cend(container));
 }
 
 template<typename T>
-std::string Curl::simpleGet(const std::string& url, std::initializer_list<T>&& list) {
-    static_assert(IsStrOrPtr<typename T::value_type>,
-                  "Underlying type of container must be of type std::string or const char*");
-    return simpleGet(url, std::begin(std::forward<T>(list)), std::end(std::forward<T>(list)));
+void Curl::setHttpHeaders(std::initializer_list<T>&& list) {
+    using list_t = typename std::initializer_list<T>;
+    static_assert(IsStrOrPtr<T>,
+                  "Underlying type of initalizer list must be of type std::string or const char*");
+    setHttpHeaders(std::cbegin(std::forward<list_t>(list)), std::cend(std::forward<list_t>(list)));
 }
 
 template<typename Iter>
-std::string Curl::simpleGet(const std::string& url, const Iter& begin, const Iter& end) {
+void Curl::setHttpHeaders(Iter begin, Iter end) {
     using val_t = typename std::iterator_traits<Iter>::value_type;
     static_assert(IsStrOrPtr< val_t >,
-                   "Underlying type of container must be of type std::string or const char*");
-
-    curl_slist* headers = nullptr;
+                   "Underlying type of iterator must be of type std::string or const char*");
     while (begin != end) {
-        setHttpHeader(*begin, headers);
+        setHttpHeader(*begin);
+        begin++;
     }
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    return simpleGet(url);
 }
 
 template<typename T>
-std::enable_if_t<isStrOrPtr<T>, std::string>
-Curl::simpleGet(const std::string& url, T&& str) {
-    // no need to check type, already known from SFINAE.
-    curl_slist* headers = nullptr;
-    setHttpHeader(str, headers);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    return simpleGet(url);
-}
+void Curl::setHttpHeader(const T& str_header) {
+    static_assert(IsStrOrPtr<T>, "Type must be of std::string or const char*");
+    if (IsStr<T>) {
+        appendHeader(str_header);
 
-template<typename T>
-void Curl::setHttpHeader(const T& item, curl_slist*& header) {
-    if (isStr<T>) {
-        if (std::find(item.cbegin(), item.cend(), ':') == item.cend()) {
-            throw std::runtime_error("Header must have a \':\' in the format \"Auth : 123 \"");
-        }
-        header = curl_slist_append(headers, begin.c_str());
     }
     else {
-        auto ptr = strchr(item, ':');
-        if (ptr == nullptr || ptr == NULL) {
-            throw std::runtime_error("Header must have a \':\' in the format \"Auth : 123 \"");
-        }
-        header = curl_slist_append(header, item);
+        appendHeader(str_header);
     }
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header_list);
 }
 
 

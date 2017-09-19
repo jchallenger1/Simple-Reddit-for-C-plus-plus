@@ -22,7 +22,7 @@ public:
     struct Messaging; //    /prefs/messaging
     struct Trusted; //      /prefs/trusted
 
-    RedditAccount::Me acc_me(const RedditUser&) const;
+    RedditAccount::Me acc_me(const RedditUser&);
 private:
     detail::Curl curl;
 };

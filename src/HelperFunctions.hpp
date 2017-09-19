@@ -15,8 +15,9 @@ struct IsStrOrPtr_IMPL<std::string> : std::true_type {};
 template<>
 struct IsStrOrPtr_IMPL<const char*> : std::true_type {};
 template<>
+struct IsStrOrPtr_IMPL<const char* const> : std::true_type {};
+template<>
 struct IsStrOrPtr_IMPL<char*> : std::true_type {};
-
 
 // Returns a bool if T is of type std::string, const char* or char*.
 template<typename T>

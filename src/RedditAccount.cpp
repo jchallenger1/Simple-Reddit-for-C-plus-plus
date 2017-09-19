@@ -9,12 +9,14 @@
 namespace redd {
 
 
-RedditAccount::Me acc_me(const RedditUser& user) const {
+RedditAccount::Me RedditAccount::acc_me(const RedditUser& user) {
     if (!user.isComplete()) {
         throw RedditError("RedditUser must be complete");
     }
     RedditAccount::Me return_me;
-    std::string unparsed = curl.simpleGet("https://oauth.reddit.com/api/v1/me", "Authorization : bearer" + user.token());
+    //curl.setHttpHeader("Authorization : bearer " + user.token());
+    curl.setHttpHeaders({"Authorization : bearer" + user.token()});
+    std::string unparsed = curl.simpleGet("https://oauth.reddit.com/api/v1/me");
     nlohmann::json json = nlohmann::json::parse(unparsed);
     {
         /*

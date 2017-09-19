@@ -14,7 +14,7 @@ int main() {
     } catch(RedditError& err) {
         std::cout << err << std::endl;
     }
-
-    std::cout << user.token() << std::endl;
+    RedditAccount me;
+    me.acc_me(user);
     return 0;
 }

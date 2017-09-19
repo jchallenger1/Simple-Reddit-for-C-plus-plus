@@ -15,7 +15,7 @@
 #include "Curl.hpp"
 #include "HelperFunctions.hpp"
 #include "RedditSimpleClient.hpp"
-#include "RedditComment.hpp"
+#include "RedditAccount.hpp"
 #include "RedditSub.hpp"
 #include "RedditUrl.hpp"
 #include "RedditUser.hpp"
