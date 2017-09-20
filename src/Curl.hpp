@@ -49,7 +49,8 @@ private:
     void appendHeader(const std::string&);
     void appendHeader(const char*);
 
-
+    // reddit api requires a unique user agent.
+    std::string user_agent = "OS:reddit++:v0.0.1 (by /u/Anonymous)";
     curl_slist* header_list;
     CURL* curl;// managed curl object
     char curl_error[CURL_ERROR_SIZE]; // buffer representing errors given from curl

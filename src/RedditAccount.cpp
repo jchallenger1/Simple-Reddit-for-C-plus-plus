@@ -14,8 +14,7 @@ RedditAccount::Me RedditAccount::acc_me(const RedditUser& user) {
         throw RedditError("RedditUser must be complete");
     }
     RedditAccount::Me return_me;
-    //curl.setHttpHeader("Authorization : bearer " + user.token());
-    curl.setHttpHeaders({"Authorization : bearer" + user.token()});
+    curl.setHttpHeader("Authorization: bearer " + user.token());
     std::string unparsed = curl.simpleGet("https://oauth.reddit.com/api/v1/me");
     nlohmann::json json = nlohmann::json::parse(unparsed);
     {
