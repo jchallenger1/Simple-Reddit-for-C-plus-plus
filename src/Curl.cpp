@@ -70,8 +70,8 @@ std::string Curl::simpleGet(const std::string &url) {
 void Curl::appendHeader(const std::string& str) {
     auto colon = std::find(str.cbegin(), str.cend(), ':');
         // must have a colon to be valid.
-    if (colon != str.cend()) {
-        throw std::runtime_error("Header must have a \':\' in the format \"Auth: 123 \"");
+    if (colon == str.cend()) {
+        throw std::runtime_error("Header must have a \':\' in the format \"Auth: 123\"");
     }
     else if ( std::find(str.cbegin(), colon, ' ') != colon ) {
         // a single space between colon and leftern key will lead to
@@ -84,9 +84,9 @@ void Curl::appendHeader(const std::string& str) {
 void Curl::appendHeader(const char* str) {
     auto colon = strchr(str, ':');
     if (colon == nullptr || colon == NULL) {
-        throw std::runtime_error("Header must have a \':\' in the format \"Auth : 123 \"");
+        throw std::runtime_error("Header must have a \':\' in the format \"Auth : 123\"");
     }
-    else if (std::find(str, colon, ' ') != colon) {
+    else if (std::find(str, colon, ' ') == colon) {
         throw std::runtime_error("There must be no space between the colon and key! format --> \"Auth: 123\"");
     }
     header_list = curl_slist_append(header_list, str);

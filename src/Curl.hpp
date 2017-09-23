@@ -86,13 +86,7 @@ void Curl::setHttpHeaders(Iter begin, Iter end) {
 template<typename T>
 void Curl::setHttpHeader(const T& str_header) {
     static_assert(IsStrOrPtr<T>, "Type must be of std::string or const char*");
-    if (IsStr<T>) {
-        appendHeader(str_header);
-
-    }
-    else {
-        appendHeader(str_header);
-    }
+    appendHeader(str_header);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header_list);
 }
 
