@@ -29,7 +29,7 @@ RedditAccount::Me RedditAccount::me(const RedditUser& user) {
     setIfNotNull(return_me.created, json, "created", static_cast<long long>(-1));
     setIfNotNull(return_me.created_utc, json, "created_utc", static_cast<long long>(-1));
     setIfNotNull(return_me.comment_karma, json, "comment_karma", -1);
-    // gold_creddits in the json api is a typo, this could be changed in the future
+    // gold_creddits in the json api could be a typo, this could be changed in the future
     // to gold_credits, therefore we must check both.
     setIfNotNull(return_me.gold_credits, json, "gold_creddits", -1);
     if (return_me.gold_credits == -1) { // typo in json is fixed
