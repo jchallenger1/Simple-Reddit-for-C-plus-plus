@@ -35,5 +35,8 @@
 *.pro
 *.pro.user
 
-# Ignore dependency files
+# Dependency files
 json.hpp
+
+# Non library files
+main.cpp
