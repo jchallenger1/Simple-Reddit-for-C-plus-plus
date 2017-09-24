@@ -15,10 +15,8 @@ int main() {
         std::cout << err << std::endl;
     }
     RedditAccount me;
-    std::cout << user.token();
-    RedditAccount::Friends n = me.friends(user);
-    for (auto& g : n.people) {
-        std::cout << g.name << std::endl;
-    }
+    std::cout << user.token() << std::endl;
+    RedditAccount::MePrefs n = me.prefs(user);
+    std::cout << n.lang << std::endl;
     return 0;
 }

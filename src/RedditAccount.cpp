@@ -59,7 +59,7 @@ RedditAccount::Friends RedditAccount::friends(const RedditUser& user) {
         throw RedditError("RedditUser must be complete");
     }
     RedditAccount::Friends friend_entry;
-    curl.setHttpHeader("Authorization:bearer " + user.token());
+    curl.setHttpHeader("Authorization: bearer " + user.token());
     std::string unparsed = curl.simpleGet("https://oauth.reddit.com/prefs/friends");
     nlohmann::json json= nlohmann::json::parse(unparsed);
 
@@ -89,8 +89,8 @@ RedditAccount::Blocked RedditAccount::blocked(const RedditUser& user) {
         throw RedditError("RedditUser must be complete");
     }
     RedditAccount::Blocked block_entry;
-    curl.setHttpHeader("Authorization:bearer " + user.token());
-    std::string unparsed = curl.simpleGet("https://oauth.reddit.com/prefs/friends");
+    curl.setHttpHeader("Authorization: bearer " + user.token());
+    std::string unparsed = curl.simpleGet("https://oauth.reddit.com/prefs/blocked");
     nlohmann::json json= nlohmann::json::parse(unparsed);
 
 
@@ -109,6 +109,137 @@ RedditAccount::Blocked RedditAccount::blocked(const RedditUser& user) {
     }
     block_entry.size = block_entry.people.size();
     return block_entry;
+}
+
+RedditAccount::Trusted RedditAccount::trusted(const RedditUser& user) {
+    if (!user.isComplete()) {
+        throw RedditError("RedditUser must be complete");
+    }
+    RedditAccount::Trusted trust_entry;
+    curl.setHttpHeader("Authorization: bearer " + user.token());
+    std::string unparsed = curl.simpleGet("https://oauth.reddit.com/prefs/trusted");
+    nlohmann::json json= nlohmann::json::parse(unparsed);
+
+    using detail::setIfNotNull;
+    if (json.find("data") != json.end()) {
+        if (json["data"].find("children") != json["data"].end()) {
+            for (auto per = json["data"]["children"].begin();
+                 per != json["data"]["children"].end(); per++ ) {
+                RedditAccount::Person single;
+                setIfNotNull(single.date, *per, "date", static_cast<long long>(-1));
+                setIfNotNull(single.id, *per, "id", "");
+                setIfNotNull(single.name, *per, "name", "");
+                trust_entry.people.push_back(single);
+            }
+        }
+    }
+    trust_entry.size = trust_entry.people.size();
+    return trust_entry;
+}
+
+RedditAccount::Messaging RedditAccount::messaging(const RedditUser& user) {
+    if (!user.isComplete()) {
+        throw RedditError("RedditUser must be complete");
+    }
+    RedditAccount::Messaging message_entry;
+    curl.setHttpHeader("Authorization: bearer " + user.token());
+    std::string unparsed = curl.simpleGet("https://oauth.reddit.com/prefs/messaging");
+    nlohmann::json json= nlohmann::json::parse(unparsed);
+
+    using detail::setIfNotNull;
+    for (const auto& lists : json) {
+        if (lists.find("data") != lists.end()) {
+            if (lists["data"].find("children") != lists["data"].end()) {
+                for (auto per = lists["data"]["children"].begin();
+                     per != lists["data"]["children"].end(); per++) {
+                    RedditAccount::Person single;
+                    setIfNotNull(single.date, *per, "date", static_cast<long long>(-1));
+                    setIfNotNull(single.id, *per, "id", "");
+                    setIfNotNull(single.name, *per, "name", "");
+                    message_entry.people.push_back(single);
+                }
+            }
+        }
+    }
+    message_entry.size = message_entry.people.size();
+    return message_entry;
+}
+
+RedditAccount::MeKarma RedditAccount::karma(const RedditUser& user) {
+    if (!user.isComplete()) {
+        throw RedditError("RedditUser must be complete");
+    }
+    RedditAccount::MeKarma karma_entry;
+    curl.setHttpHeader("Authorization: bearer " + user.token());
+    std::string unparsed = curl.simpleGet("https://oauth.reddit.com/api/v1/me/karma");
+    nlohmann::json json= nlohmann::json::parse(unparsed);
+
+    using detail::setIfNotNull;
+    if (json.find("data") != json.end()) {
+        for (auto iter = json["data"].begin(); iter != json["data"].end(); iter++) {
+            RedditAccount::Karma single;
+            setIfNotNull(single.sr, *iter, "sr", "");
+            setIfNotNull(single.comment_karma, *iter, "comment_karma", -1);
+            setIfNotNull(single.link_karma, *iter, "link_karma", -1);
+            karma_entry.karmas.push_back(single);
+        }
+    }
+    karma_entry.size = karma_entry.karmas.size();
+    return karma_entry;
+}
+
+RedditAccount::MePrefs RedditAccount::prefs(const RedditUser & user) {
+    if (!user.isComplete()) {
+        throw RedditError("RedditUser must be complete");
+    }
+    RedditAccount::MePrefs pref;
+    curl.setHttpHeader("Authorization: bearer " + user.token());
+    std::string unparsed = curl.simpleGet("https://oauth.reddit.com/api/v1/me/prefs");
+    nlohmann::json json= nlohmann::json::parse(unparsed);
+
+    using detail::setIfNotNull;
+    // String types
+    setIfNotNull(pref.lang, json, "lang", "");
+    setIfNotNull(pref.media, json, "media", "");
+    setIfNotNull(pref.default_comment_sort, json, "default_comment_sort", "");
+    setIfNotNull(pref.accept_pms, json, "accept_pms", "");
+    // Intergral types
+    setIfNotNull(pref.numsites, json, "numsites", -1);
+    setIfNotNull(pref.num_comments, json, "num_comments", -1);
+    setIfNotNull(pref.min_link_score, json, "min_link_score", -1);
+
+    //Boolean types
+    setIfNotNull(pref.activity_relevant_ads, json, "activity_relevant_ads", false);
+    setIfNotNull(pref.allow_clicktracking, json, "allow_clicktracking", false);
+    setIfNotNull(pref.clickgadget, json, "clickgadget", false);
+    setIfNotNull(pref.collapse_read_messages, json, "collapse_read_messages", false);
+    setIfNotNull(pref.domain_details, json, "domain_details", false);
+    setIfNotNull(pref.email_digests, json, "email_digests", false);
+    setIfNotNull(pref.email_messages, json, "email_messages", false);
+    setIfNotNull(pref.enable_default_themes, json, "enable_default_themes", false);
+    setIfNotNull(pref.hide_abusive_comments, json, "hide_abusive_comments", false);
+    setIfNotNull(pref.hide_ads, json, "hide_ads", false);
+    setIfNotNull(pref.hide_downs, json, "hide_downs", false);
+    setIfNotNull(pref.hide_locationbar, json, "hide_locationbar", false);
+    setIfNotNull(pref.hide_ups, json, "hide_ups", false);
+    setIfNotNull(pref.ignore_suggested_sort, json, "ignore_suggested_sort", false);
+    setIfNotNull(pref.label_nsfw, json, "label_nsfw", false);
+    setIfNotNull(pref.mark_messages_read, json, "mark_messages_read", false);
+    setIfNotNull(pref.monitor_mentions, json, "monitor_mentions", false);
+    setIfNotNull(pref.no_profanity, json, "no_profanity", false);
+    setIfNotNull(pref.over_18, json, "over_18", false);
+    setIfNotNull(pref.private_feeds, json, "private_feeds", false);
+    setIfNotNull(pref.public_votes, json, "public_votes", false);
+    setIfNotNull(pref.search_include_over_18, json, "search_include_over_18", false);
+    setIfNotNull(pref.show_flair, json, "show_flair", false);
+    setIfNotNull(pref.show_link_flair, json, "show_link_flair", false);
+    setIfNotNull(pref.show_snoovatar, json, "show_snoovatar", false);
+    setIfNotNull(pref.show_stylesheets, json, "show_stylesheets", false);
+    setIfNotNull(pref.show_trending, json, "show_trending", false);
+    setIfNotNull(pref.threaded_messages, json, "threaded_messages", false);
+    setIfNotNull(pref.use_global_defaults, json, "use_global_defaults", false);
+
+    return pref;
 }
 
 }//! redd namespace
