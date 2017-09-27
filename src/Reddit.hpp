@@ -16,9 +16,11 @@
 #include "RedditError.hpp"
 #include "HelperFunctions.hpp"
 #include "RedditSimpleClient.hpp"
-#include "RedditAccount.hpp"
 #include "RedditSub.hpp"
 #include "RedditUrl.hpp"
 #include "RedditUser.hpp"
+
+#include "MethodAccount.hpp"
+#include "MethodListing.hpp"
 
 #endif

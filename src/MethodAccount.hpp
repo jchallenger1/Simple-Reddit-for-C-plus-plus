@@ -1,5 +1,5 @@
-#ifndef APIMETHOD_REDDITACCOUNT
-#define APIMETHOD_REDDITACCOUNT
+#ifndef APIMETHOD_ACCOUNT
+#define APIMETHOD_ACCOUNT
 
 #include <string>
 #include <vector>
@@ -9,7 +9,7 @@
 
 namespace redd {
 
-class RedditAccount {
+class MethodAccount {
 public:
     struct Me; //           return information for /api/v1/me
     struct MeKarma; //      /api/v1/me/karma
@@ -35,7 +35,7 @@ private:
     detail::Curl curl;
 };
 
-struct RedditAccount::Me {
+struct MethodAccount::Me {
     std::string id;
     std::string name;
     std::string oauth_client_id;
@@ -62,7 +62,7 @@ struct RedditAccount::Me {
 
 };
 
-struct RedditAccount::MePrefs {
+struct MethodAccount::MePrefs {
     std::string lang;
     std::string media;
     std::string default_comment_sort;
@@ -103,38 +103,38 @@ struct RedditAccount::MePrefs {
     bool use_global_defaults;
 };
 
-struct RedditAccount::MeKarma {
-    std::vector<RedditAccount::Karma> karmas;
+struct MethodAccount::MeKarma {
+    std::vector<MethodAccount::Karma> karmas;
     int size;
 };
 
-struct RedditAccount::Karma {
+struct MethodAccount::Karma {
     std::string sr;
     int comment_karma;
     int link_karma;
 };
 
-struct RedditAccount::Messaging {
-    std::vector<RedditAccount::Person> people;
+struct MethodAccount::Messaging {
+    std::vector<MethodAccount::Person> people;
     int size;
 };
 
-struct RedditAccount::Trusted {
-    std::vector<RedditAccount::Person> people;
+struct MethodAccount::Trusted {
+    std::vector<MethodAccount::Person> people;
     int size;
 };
 
-struct RedditAccount::Friends {
-    std::vector<RedditAccount::Person> people;
+struct MethodAccount::Friends {
+    std::vector<MethodAccount::Person> people;
     int size;
 };
 
-struct RedditAccount::Blocked {
-    std::vector<RedditAccount::Person> people;
+struct MethodAccount::Blocked {
+    std::vector<MethodAccount::Person> people;
     int size;
 };
 
-struct RedditAccount::Person {
+struct MethodAccount::Person {
     long long date;
     std::string id;
     std::string name;

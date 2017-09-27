@@ -11,7 +11,7 @@ namespace redd {
 class RedditUser {
     friend bool operator==(const RedditUser& lhs, const RedditUser& rhs);
 public:
-    RedditUser(const std::string& user ="", const std::string& pass = "", const std::string& ID = "", const std::string& secret = "")
+    explicit RedditUser(const std::string& user ="", const std::string& pass = "", const std::string& ID = "", const std::string& secret = "")
         : username(user),password(pass),client_ID(ID),client_secret(secret),
     time_token(std::chrono::system_clock::now()) {}
 

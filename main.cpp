@@ -14,9 +14,7 @@ int main() {
     } catch(RedditError& err) {
         std::cout << err << std::endl;
     }
-    RedditAccount me;
+    MethodAccount me;
     std::cout << user.token() << std::endl;
-    RedditAccount::MePrefs n = me.prefs(user);
-    std::cout << n.lang << std::endl;
     return 0;
 }

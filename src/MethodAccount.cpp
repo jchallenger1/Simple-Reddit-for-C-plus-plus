@@ -3,18 +3,18 @@
 
 #include "json.hpp"
 
-#include "RedditAccount.hpp"
+#include "MethodAccount.hpp"
 #include "RedditUser.hpp"
 #include "RedditError.hpp"
 
 namespace redd {
 
 
-RedditAccount::Me RedditAccount::me(const RedditUser& user) {
+MethodAccount::Me MethodAccount::me(const RedditUser& user) {
     if (!user.isComplete()) {
         throw RedditError("RedditUser must be complete");
     }
-    RedditAccount::Me return_me;
+    MethodAccount::Me return_me;
     curl.setHttpHeader("Authorization: bearer " + user.token());
     std::string unparsed = curl.simpleGet("https://oauth.reddit.com/api/v1/me");
     nlohmann::json json = nlohmann::json::parse(unparsed);
@@ -54,11 +54,11 @@ RedditAccount::Me RedditAccount::me(const RedditUser& user) {
     return return_me;
 }
 
-RedditAccount::Friends RedditAccount::friends(const RedditUser& user) {
+MethodAccount::Friends MethodAccount::friends(const RedditUser& user) {
     if (!user.isComplete()) {
         throw RedditError("RedditUser must be complete");
     }
-    RedditAccount::Friends friend_entry;
+    MethodAccount::Friends friend_entry;
     curl.setHttpHeader("Authorization: bearer " + user.token());
     std::string unparsed = curl.simpleGet("https://oauth.reddit.com/prefs/friends");
     nlohmann::json json= nlohmann::json::parse(unparsed);
@@ -70,7 +70,7 @@ RedditAccount::Friends RedditAccount::friends(const RedditUser& user) {
             if (lists["data"].find("children") != lists["data"].end()) {
                 for (auto per = lists["data"]["children"].begin();
                      per != lists["data"]["children"].end(); per++) {
-                    RedditAccount::Person single;
+                    MethodAccount::Person single;
                     setIfNotNull(single.date, *per, "date", static_cast<long long>(-1));
                     setIfNotNull(single.id, *per, "id", "");
                     setIfNotNull(single.name, *per, "name", "");
@@ -84,11 +84,11 @@ RedditAccount::Friends RedditAccount::friends(const RedditUser& user) {
 }
 
 
-RedditAccount::Blocked RedditAccount::blocked(const RedditUser& user) {
+MethodAccount::Blocked MethodAccount::blocked(const RedditUser& user) {
     if (!user.isComplete()) {
         throw RedditError("RedditUser must be complete");
     }
-    RedditAccount::Blocked block_entry;
+    MethodAccount::Blocked block_entry;
     curl.setHttpHeader("Authorization: bearer " + user.token());
     std::string unparsed = curl.simpleGet("https://oauth.reddit.com/prefs/blocked");
     nlohmann::json json= nlohmann::json::parse(unparsed);
@@ -99,7 +99,7 @@ RedditAccount::Blocked RedditAccount::blocked(const RedditUser& user) {
         if (json["data"].find("children") != json["data"].end()) {
             for (auto per = json["data"]["children"].begin();
                  per != json["data"]["children"].end(); per++ ) {
-                RedditAccount::Person single;
+                MethodAccount::Person single;
                 setIfNotNull(single.date, *per, "date", static_cast<long long>(-1));
                 setIfNotNull(single.id, *per, "id", "");
                 setIfNotNull(single.name, *per, "name", "");
@@ -111,11 +111,11 @@ RedditAccount::Blocked RedditAccount::blocked(const RedditUser& user) {
     return block_entry;
 }
 
-RedditAccount::Trusted RedditAccount::trusted(const RedditUser& user) {
+MethodAccount::Trusted MethodAccount::trusted(const RedditUser& user) {
     if (!user.isComplete()) {
         throw RedditError("RedditUser must be complete");
     }
-    RedditAccount::Trusted trust_entry;
+    MethodAccount::Trusted trust_entry;
     curl.setHttpHeader("Authorization: bearer " + user.token());
     std::string unparsed = curl.simpleGet("https://oauth.reddit.com/prefs/trusted");
     nlohmann::json json= nlohmann::json::parse(unparsed);
@@ -125,7 +125,7 @@ RedditAccount::Trusted RedditAccount::trusted(const RedditUser& user) {
         if (json["data"].find("children") != json["data"].end()) {
             for (auto per = json["data"]["children"].begin();
                  per != json["data"]["children"].end(); per++ ) {
-                RedditAccount::Person single;
+                MethodAccount::Person single;
                 setIfNotNull(single.date, *per, "date", static_cast<long long>(-1));
                 setIfNotNull(single.id, *per, "id", "");
                 setIfNotNull(single.name, *per, "name", "");
@@ -137,11 +137,11 @@ RedditAccount::Trusted RedditAccount::trusted(const RedditUser& user) {
     return trust_entry;
 }
 
-RedditAccount::Messaging RedditAccount::messaging(const RedditUser& user) {
+MethodAccount::Messaging MethodAccount::messaging(const RedditUser& user) {
     if (!user.isComplete()) {
         throw RedditError("RedditUser must be complete");
     }
-    RedditAccount::Messaging message_entry;
+    MethodAccount::Messaging message_entry;
     curl.setHttpHeader("Authorization: bearer " + user.token());
     std::string unparsed = curl.simpleGet("https://oauth.reddit.com/prefs/messaging");
     nlohmann::json json= nlohmann::json::parse(unparsed);
@@ -152,7 +152,7 @@ RedditAccount::Messaging RedditAccount::messaging(const RedditUser& user) {
             if (lists["data"].find("children") != lists["data"].end()) {
                 for (auto per = lists["data"]["children"].begin();
                      per != lists["data"]["children"].end(); per++) {
-                    RedditAccount::Person single;
+                    MethodAccount::Person single;
                     setIfNotNull(single.date, *per, "date", static_cast<long long>(-1));
                     setIfNotNull(single.id, *per, "id", "");
                     setIfNotNull(single.name, *per, "name", "");
@@ -165,11 +165,11 @@ RedditAccount::Messaging RedditAccount::messaging(const RedditUser& user) {
     return message_entry;
 }
 
-RedditAccount::MeKarma RedditAccount::karma(const RedditUser& user) {
+MethodAccount::MeKarma MethodAccount::karma(const RedditUser& user) {
     if (!user.isComplete()) {
         throw RedditError("RedditUser must be complete");
     }
-    RedditAccount::MeKarma karma_entry;
+    MethodAccount::MeKarma karma_entry;
     curl.setHttpHeader("Authorization: bearer " + user.token());
     std::string unparsed = curl.simpleGet("https://oauth.reddit.com/api/v1/me/karma");
     nlohmann::json json= nlohmann::json::parse(unparsed);
@@ -177,7 +177,7 @@ RedditAccount::MeKarma RedditAccount::karma(const RedditUser& user) {
     using detail::setIfNotNull;
     if (json.find("data") != json.end()) {
         for (auto iter = json["data"].begin(); iter != json["data"].end(); iter++) {
-            RedditAccount::Karma single;
+            MethodAccount::Karma single;
             setIfNotNull(single.sr, *iter, "sr", "");
             setIfNotNull(single.comment_karma, *iter, "comment_karma", -1);
             setIfNotNull(single.link_karma, *iter, "link_karma", -1);
@@ -188,11 +188,11 @@ RedditAccount::MeKarma RedditAccount::karma(const RedditUser& user) {
     return karma_entry;
 }
 
-RedditAccount::MePrefs RedditAccount::prefs(const RedditUser & user) {
+MethodAccount::MePrefs MethodAccount::prefs(const RedditUser & user) {
     if (!user.isComplete()) {
         throw RedditError("RedditUser must be complete");
     }
-    RedditAccount::MePrefs pref;
+    MethodAccount::MePrefs pref;
     curl.setHttpHeader("Authorization: bearer " + user.token());
     std::string unparsed = curl.simpleGet("https://oauth.reddit.com/api/v1/me/prefs");
     nlohmann::json json= nlohmann::json::parse(unparsed);
