@@ -14,7 +14,11 @@ int main() {
     } catch(RedditError& err) {
         std::cout << err << std::endl;
     }
-    MethodAccount me;
+    MethodListing list, other;
+    list = other;
+    list = std::move(other);
+    MethodListing n(list);
+    MethodListing q(std::move(list));
     std::cout << user.token() << std::endl;
     return 0;
 }

@@ -19,10 +19,12 @@ namespace redd {
 
 namespace detail {
 
+// To Do : Use Smart Pointers to manage the object.
 class Curl {
 public:
     Curl();
     ~Curl();
+    //Curl(const Curl&);
     std::string simplePost(const std::string& url, const redd::RedditUser&, const std::string post_fields = ""); // creates a POST request to url
 
     std::string simpleGet(const std::string& url); // create a HTTP get request to url
