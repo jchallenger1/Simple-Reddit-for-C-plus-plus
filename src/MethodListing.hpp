@@ -10,7 +10,11 @@
 
 namespace redd {
 
-
+/*
+ * In this class currently, there are many structs and functions that
+ * do similar work making a lot unneccesary. However the class should first get all
+ * listing api methods working before working on connecting them together.
+ */
 
 class MethodListing : public detail::Method {
 public:
@@ -24,30 +28,102 @@ public:
     struct Award;
 
     struct Hot;
+    struct New;
 
-    explicit MethodListing() : detail::Method() {}
+    explicit MethodListing()
+        : detail::Method(), extra_inputs(std::make_unique<Inputs>()) {}
     MethodListing(const detail::Method& m);
+
 
     void setInputs(const Inputs&);
     Inputs& inputs() const;
+    New _new(const RedditUser&, const std::string& s);
     Hot hot(const RedditUser&, const std::string& s);
 private:
-    std::unique_ptr<Inputs> extraInputs;
+    std::unique_ptr<Inputs> extra_inputs;
+
+    Link parseLinkT3(const nlohmann::json&) const;
+    std::string inputsToString() const;
 };
+
+struct MethodListing::Hot {
+    std::string after;
+    std::string before;
+    std::vector<Link> links;
+    std::string modhash;
+};
+
+struct MethodListing::New {
+    std::string after;
+    std::string before;
+    std::vector<Link> links;
+    std::string modhash;
+};
+
+
 
 struct MethodListing::Inputs {
     std::string after;
     std::string before;
-    std::string count;
     std::string g;
+    std::string show;
+    int count;
     int limit;
-    bool show;
     bool sr_detail;
 };
 
-struct MethodListing::Hot {
+struct MethodListing::Link {
+    std::string author;
+    std::string banned_by;
+    std::string domain;
+    std::string id;
+    std::string link_flair_text;
+    std::string name;
+    std::string permalink;
+    std::string selftext;
+    std::string selftext_html;
+    std::string subreddit;
+    std::string subreddit_id;
+    std::string subreddit_name_prefixed;
+    std::string subreddit_type;
+    std::string thumbnail;
+    std::string title;
+    std::string url;
+    std::string whitelist_status;
 
+    long long approved_at_utc;
+    long long banned_at_utc;
+    long long created_utc;
+    long long edited;
+
+    int downs;
+    int gilded;
+    int likes;
+    int num_comments;
+    int num_crossposts;
+    int report_reasons;
+    int score;
+    int ups;
+    int view_count;
+
+    bool archived;
+    bool can_gild;
+    bool can_mod_post;
+    bool clicked;
+    bool hidden;
+    bool hide_score;
+    bool is_crosspostable;
+    bool is_self;
+    bool is_video;
+    bool locked;
+    bool over_18;
+    bool spoiler;
+    bool stickied;
+    bool visted;
 };
+
+
+
 
 } //! redd namespace
 
