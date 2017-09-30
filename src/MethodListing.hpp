@@ -6,12 +6,13 @@
 
 #include "Curl.hpp"
 #include "RedditUser.hpp"
+#include "Method.hpp"
 
 namespace redd {
 
 
 
-class MethodListing {
+class MethodListing : public detail::Method {
 public:
     struct Inputs;
 
@@ -24,15 +25,14 @@ public:
 
     struct Hot;
 
-    MethodListing() : extraInputs(std::make_unique<Inputs>()) {}
-    MethodListing(const MethodListing&);
-    MethodListing& operator =(const MethodListing&);
-    //void setInputs(const Inputs&);
-    //Inputs& inputs() const;
-    //Hot hot(const RedditUser&,const std::string& s);
+    explicit MethodListing() : detail::Method() {}
+    MethodListing(const detail::Method& m);
+
+    void setInputs(const Inputs&);
+    Inputs& inputs() const;
+    Hot hot(const RedditUser&, const std::string& s);
 private:
     std::unique_ptr<Inputs> extraInputs;
-    detail::Curl curl;
 };
 
 struct MethodListing::Inputs {
@@ -45,7 +45,9 @@ struct MethodListing::Inputs {
     bool sr_detail;
 };
 
+struct MethodListing::Hot {
 
+};
 
 } //! redd namespace
 

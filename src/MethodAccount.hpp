@@ -6,10 +6,11 @@
 
 #include "Curl.hpp"
 #include "RedditUser.hpp"
+#include "Method.hpp"
 
 namespace redd {
 
-class MethodAccount {
+class MethodAccount : public detail::Method {
 public:
     struct Me; //           return information for /api/v1/me
     struct MeKarma; //      /api/v1/me/karma
@@ -24,6 +25,9 @@ public:
     struct Person; // struct to represent data returned from /pref/blocked(/friends) and /me/blocked(/friends);
     struct Karma; // represent return from /api/ve/me/karma.
 
+    explicit MethodAccount() : detail::Method() {}
+    MethodAccount(const Method& m);
+
     Me me(const RedditUser&); // method to return /api/v1/me
     Friends friends(const RedditUser&); // /prefs/friends & /api/v1/me/friends
     Blocked blocked(const RedditUser&); // /prefs/blocked & /api/v1/me/blocked
@@ -31,8 +35,6 @@ public:
     Messaging messaging(const RedditUser&); // /prefs/messaging
     MeKarma karma(const RedditUser&); // /api/v1/me/karma
     MePrefs prefs(const RedditUser&); // api/v1/me/prefs
-private:
-    detail::Curl curl;
 };
 
 struct MethodAccount::Me {

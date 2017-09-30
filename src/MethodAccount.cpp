@@ -9,14 +9,17 @@
 
 namespace redd {
 
+MethodAccount::MethodAccount(const Method& m){
+    setDependencyOn(m);
+}
 
 MethodAccount::Me MethodAccount::me(const RedditUser& user) {
     if (!user.isComplete()) {
         throw RedditError("RedditUser must be complete");
     }
     MethodAccount::Me return_me;
-    curl.setHttpHeader("Authorization: bearer " + user.token());
-    std::string unparsed = curl.simpleGet("https://oauth.reddit.com/api/v1/me");
+    curl->setHttpHeader("Authorization: bearer " + user.token());
+    std::string unparsed = curl->simpleGet("https://oauth.reddit.com/api/v1/me");
     nlohmann::json json = nlohmann::json::parse(unparsed);
     using detail::setIfNotNull;
 
@@ -59,8 +62,8 @@ MethodAccount::Friends MethodAccount::friends(const RedditUser& user) {
         throw RedditError("RedditUser must be complete");
     }
     MethodAccount::Friends friend_entry;
-    curl.setHttpHeader("Authorization: bearer " + user.token());
-    std::string unparsed = curl.simpleGet("https://oauth.reddit.com/prefs/friends");
+    curl->setHttpHeader("Authorization: bearer " + user.token());
+    std::string unparsed = curl->simpleGet("https://oauth.reddit.com/prefs/friends");
     nlohmann::json json= nlohmann::json::parse(unparsed);
 
 
@@ -89,8 +92,8 @@ MethodAccount::Blocked MethodAccount::blocked(const RedditUser& user) {
         throw RedditError("RedditUser must be complete");
     }
     MethodAccount::Blocked block_entry;
-    curl.setHttpHeader("Authorization: bearer " + user.token());
-    std::string unparsed = curl.simpleGet("https://oauth.reddit.com/prefs/blocked");
+    curl->setHttpHeader("Authorization: bearer " + user.token());
+    std::string unparsed = curl->simpleGet("https://oauth.reddit.com/prefs/blocked");
     nlohmann::json json= nlohmann::json::parse(unparsed);
 
 
@@ -116,8 +119,8 @@ MethodAccount::Trusted MethodAccount::trusted(const RedditUser& user) {
         throw RedditError("RedditUser must be complete");
     }
     MethodAccount::Trusted trust_entry;
-    curl.setHttpHeader("Authorization: bearer " + user.token());
-    std::string unparsed = curl.simpleGet("https://oauth.reddit.com/prefs/trusted");
+    curl->setHttpHeader("Authorization: bearer " + user.token());
+    std::string unparsed = curl->simpleGet("https://oauth.reddit.com/prefs/trusted");
     nlohmann::json json= nlohmann::json::parse(unparsed);
 
     using detail::setIfNotNull;
@@ -142,8 +145,8 @@ MethodAccount::Messaging MethodAccount::messaging(const RedditUser& user) {
         throw RedditError("RedditUser must be complete");
     }
     MethodAccount::Messaging message_entry;
-    curl.setHttpHeader("Authorization: bearer " + user.token());
-    std::string unparsed = curl.simpleGet("https://oauth.reddit.com/prefs/messaging");
+    curl->setHttpHeader("Authorization: bearer " + user.token());
+    std::string unparsed = curl->simpleGet("https://oauth.reddit.com/prefs/messaging");
     nlohmann::json json= nlohmann::json::parse(unparsed);
 
     using detail::setIfNotNull;
@@ -170,8 +173,8 @@ MethodAccount::MeKarma MethodAccount::karma(const RedditUser& user) {
         throw RedditError("RedditUser must be complete");
     }
     MethodAccount::MeKarma karma_entry;
-    curl.setHttpHeader("Authorization: bearer " + user.token());
-    std::string unparsed = curl.simpleGet("https://oauth.reddit.com/api/v1/me/karma");
+    curl->setHttpHeader("Authorization: bearer " + user.token());
+    std::string unparsed = curl->simpleGet("https://oauth.reddit.com/api/v1/me/karma");
     nlohmann::json json= nlohmann::json::parse(unparsed);
 
     using detail::setIfNotNull;
@@ -193,8 +196,8 @@ MethodAccount::MePrefs MethodAccount::prefs(const RedditUser & user) {
         throw RedditError("RedditUser must be complete");
     }
     MethodAccount::MePrefs pref;
-    curl.setHttpHeader("Authorization: bearer " + user.token());
-    std::string unparsed = curl.simpleGet("https://oauth.reddit.com/api/v1/me/prefs");
+    curl->setHttpHeader("Authorization: bearer " + user.token());
+    std::string unparsed = curl->simpleGet("https://oauth.reddit.com/api/v1/me/prefs");
     nlohmann::json json= nlohmann::json::parse(unparsed);
 
     using detail::setIfNotNull;
