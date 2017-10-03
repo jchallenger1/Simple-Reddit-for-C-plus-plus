@@ -29,6 +29,7 @@ public:
 
     struct Hot;
     struct New;
+    struct Random;
 
     explicit MethodListing()
         : detail::Method(), extra_inputs(std::make_unique<Inputs>()) {}
@@ -36,31 +37,19 @@ public:
 
 
     void setInputs(const Inputs&);
+    void resetInputs();
     Inputs& inputs() const;
+
     New _new(const RedditUser&, const std::string& s);
     Hot hot(const RedditUser&, const std::string& s);
+    Random random(const RedditUser&, const std::string&);
 private:
     std::unique_ptr<Inputs> extra_inputs;
 
     Link parseLinkT3(const nlohmann::json&) const;
+    Comment parseCommentT1(const nlohmann::json&) const;
     std::string inputsToString() const;
 };
-
-struct MethodListing::Hot {
-    std::string after;
-    std::string before;
-    std::vector<Link> links;
-    std::string modhash;
-};
-
-struct MethodListing::New {
-    std::string after;
-    std::string before;
-    std::vector<Link> links;
-    std::string modhash;
-};
-
-
 
 struct MethodListing::Inputs {
     std::string after;
@@ -120,6 +109,61 @@ struct MethodListing::Link {
     bool spoiler;
     bool stickied;
     bool visted;
+};
+
+struct MethodListing::Comment {
+    std::vector<Comment> children;
+
+    std::string author;
+    std::string banned_by;
+    std::string body;
+    std::string id;
+    std::string link_id;
+    std::string name;
+    std::string parent_id;
+    std::string subreddit;
+    std::string subreddit_id;
+    std::string subreddit_name_prefixed;
+    std::string subreddit_type;
+
+    long long banned_at_utc;
+    long long created;
+    long long created_utc;
+    long long edited;
+
+    int downs;
+    int gilded;
+    int likes;
+    int num_reports;
+    int score;
+    int ups;
+
+    bool archived;
+    bool can_gild;
+    bool can_mod_post;
+    bool collapsed;
+    bool is_sumbitter;
+    bool saved;
+    bool stickied;
+};
+
+struct MethodListing::Hot {
+    std::string after;
+    std::string before;
+    std::vector<Link> links;
+    std::string modhash;
+};
+
+struct MethodListing::New {
+    std::string after;
+    std::string before;
+    std::vector<Link> links;
+    std::string modhash;
+};
+
+struct MethodListing::Random {
+    Link link;
+    std::vector<Comment> comments;
 };
 
 
