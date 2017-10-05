@@ -45,6 +45,8 @@ public:
 
     void addJson();
 
+    void removeQueryString(const std::string& key);
+
     void addQueryString(const std::string& str);
 
     template<typename T>

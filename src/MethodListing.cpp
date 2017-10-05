@@ -75,17 +75,14 @@ MethodListing::New MethodListing::_new(const RedditUser& user, const std::string
 }
 
 MethodListing::Random MethodListing::random(const RedditUser& user, const std::string& s) {
+    curl->emptyErrors();
     if (!user.isComplete()) {
         throw RedditError("RedditUser must be complete");
     }
     Random random;
     curl->setHttpHeader("Authorization: bearer " + user.token());
-    RedditUrl url("https://oauth.reddit.com/r/" + s + "/random");
-    std::string query_strings = inputsToString();
-    if (!query_strings.empty()) {
-        url.addQueryString(query_strings);
-    }
-    std::string unparsed = curl->simpleGet(url.url());
+    std::string url("https://oauth.reddit.com/r/" + s + "/random");
+    std::string unparsed = curl->simpleGet(url);
     nlohmann::json json = nlohmann::json::parse(unparsed);
     // object comes in form of an array always with size 2.
     if (json.size() != 2) {

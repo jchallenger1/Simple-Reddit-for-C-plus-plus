@@ -102,6 +102,34 @@ void RedditUrl::addJson() {// add .json onto the url at end of the url in format
     }
 }
 
+// function searches in return_url and removes the query string corresponding
+// to the key, ...&n=25&g=34&p=50, key=g -> ...&n=25&p=50
+void RedditUrl::removeQueryString(const std::string& key) {
+    auto ques_mark = std::find(return_url.begin(), return_url.end(), '?');
+
+    if (ques_mark != return_url.end()) {
+        bool isLast = !std::regex_search(ques_mark, return_url.end(),key + "=.+(?=&)");
+        if (isLast) {
+            std::regex new_reg( "(.+?)" + std::string("(me") + ".+)");
+            std::string pattern("$1");
+            return_url = std::regex_replace(ques_mark, return_url.end(), new_reg, pattern);
+        }
+        else {
+            std::regex reg("(.+?)(" + key + "=.+?&)(.+)");
+            std::string pattern("$1$3");
+            return_url =  std::regex_replace(ques_mark, return_url.end(), reg, pattern);
+        }
+        // if any, clear unneeded marks.
+        ques_mark = std::find(return_url.rbegin(), return_url.rend(), '?').base();
+        if (ques_mark == return_url - 1) {
+            return_url.erase(ques_mark);
+        }
+        auto and_mark = std::find(return_url.rbegin(), return_url.rend(), '&').base();
+        if (and_mark == return_url - 1) {
+            return_url.erase(and_mark);
+        }
+    }
+}
 
 void RedditUrl::addQueryString(const std::string& str) {
     auto ques_mark = std::find(return_url.begin(), return_url.end(), '?');
