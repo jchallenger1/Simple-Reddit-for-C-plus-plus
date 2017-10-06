@@ -30,6 +30,9 @@ public:
     struct Hot;
     struct New;
     struct Random;
+    struct Top;
+    struct Controversial;
+
 
     explicit MethodListing()
         : detail::Method(), extra_inputs(std::make_unique<Inputs>()) {}
@@ -38,11 +41,13 @@ public:
 
     void setInputs(const Inputs&);
     void resetInputs();
-    Inputs& inputs() const;
+    Inputs& inputs();
 
     New _new(const RedditUser&, const std::string& s);
     Hot hot(const RedditUser&, const std::string& s);
     Random random(const RedditUser&, const std::string&);
+    Top top(const RedditUser&, const std::string& s);
+    Controversial controversial(const RedditUser&, const std::string& s);
 private:
     std::unique_ptr<Inputs> extra_inputs;
 
@@ -55,6 +60,7 @@ struct MethodListing::Inputs {
     std::string after;
     std::string before;
     std::string g;
+    std::string t;
     std::string show;
     int count;
     int limit;
@@ -166,8 +172,19 @@ struct MethodListing::Random {
     std::vector<Comment> comments;
 };
 
+struct MethodListing::Top {
+    std::string after;
+    std::string before;
+    std::vector<Link> links;
+    std::string modhash;
+};
 
-
+struct MethodListing::Controversial {
+    std::string after;
+    std::string before;
+    std::vector<Link> links;
+    std::string modhash;
+};
 
 } //! redd namespace
 

@@ -108,25 +108,26 @@ void RedditUrl::removeQueryString(const std::string& key) {
     auto ques_mark = std::find(return_url.begin(), return_url.end(), '?');
 
     if (ques_mark != return_url.end()) {
-        bool isLast = !std::regex_search(ques_mark, return_url.end(),key + "=.+(?=&)");
+        bool isLast = !std::regex_search(ques_mark, return_url.end(), std::regex(key + "=.+(?=&)"));
         if (isLast) {
-            std::regex new_reg( "(.+?)" + std::string("(me") + ".+)");
+            // the query string is at the end of the url.
+            std::regex new_reg( "(.+?)(" + key + "=.+)");
             std::string pattern("$1");
-            return_url = std::regex_replace(ques_mark, return_url.end(), new_reg, pattern);
+            return_url = std::regex_replace(return_url, new_reg, pattern);
         }
         else {
             std::regex reg("(.+?)(" + key + "=.+?&)(.+)");
             std::string pattern("$1$3");
-            return_url =  std::regex_replace(ques_mark, return_url.end(), reg, pattern);
+            return_url =  std::regex_replace(return_url, reg, pattern);
         }
-        // if any, clear unneeded marks.
-        ques_mark = std::find(return_url.rbegin(), return_url.rend(), '?').base();
-        if (ques_mark == return_url - 1) {
+        // if any, clear unneeded marks at the end of the url.
+        ques_mark = std::find(return_url.begin(), return_url.end(), '?');
+        if (ques_mark == return_url.end() - 1) {
             return_url.erase(ques_mark);
         }
-        auto and_mark = std::find(return_url.rbegin(), return_url.rend(), '&').base();
-        if (and_mark == return_url - 1) {
-            return_url.erase(and_mark);
+        auto and_mark = std::find(return_url.rbegin(), return_url.rend(), '&');
+        if (and_mark == return_url.rbegin()) {
+            return_url.erase(and_mark.base() -1 );
         }
     }
 }

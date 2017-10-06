@@ -17,6 +17,7 @@ MethodListing::MethodListing(const detail::Method& m) : extra_inputs(std::make_u
 
 
 MethodListing::Hot MethodListing::hot(const RedditUser& user, const std::string& s) {
+    curl->curlErrors();
     if (!user.isComplete()) {
         throw RedditError("RedditUser must be complete");
     }
@@ -26,6 +27,7 @@ MethodListing::Hot MethodListing::hot(const RedditUser& user, const std::string&
     std::string query_strings = inputsToString();
     if (!query_strings.empty()) {
         url.addQueryString(query_strings);
+        url.removeQueryString("t");
     }
     std::string unparsed = curl->simpleGet(url.url());
     nlohmann::json json = nlohmann::json::parse(unparsed);
@@ -46,6 +48,7 @@ MethodListing::Hot MethodListing::hot(const RedditUser& user, const std::string&
 }
 
 MethodListing::New MethodListing::_new(const RedditUser& user, const std::string& s) {
+    curl->emptyErrors();
     if (!user.isComplete()) {
         throw RedditError("RedditUser must be complete");
     }
@@ -55,6 +58,7 @@ MethodListing::New MethodListing::_new(const RedditUser& user, const std::string
     std::string query_strings = inputsToString();
     if (!query_strings.empty()) {
         url.addQueryString(query_strings);
+        url.removeQueryString("t");
     }
     std::string unparsed = curl->simpleGet(url.url());
     nlohmann::json json = nlohmann::json::parse(unparsed);
@@ -108,6 +112,66 @@ MethodListing::Random MethodListing::random(const RedditUser& user, const std::s
     return random;
 }
 
+MethodListing::Top MethodListing::top(const RedditUser &user , const std::string &s) {
+    curl->curlErrors();
+    if (!user.isComplete()) {
+        throw RedditError("RedditUser must be complete");
+    }
+    Top top;
+    curl->setHttpHeader("Authorization: bearer " + user.token());
+    RedditUrl url("https://oauth.reddit.com/r/" + s + "/top");
+    std::string query_strings = inputsToString();
+    if (!query_strings.empty()) {
+        url.addQueryString(query_strings);
+    }
+    std::string unparsed = curl->simpleGet(url.url());
+    nlohmann::json json = nlohmann::json::parse(unparsed);
+
+    using detail::setIfNotNull;
+    if (json.find("data") != json.end()) {
+        setIfNotNull(top.after, json["data"], "after", "");
+        setIfNotNull(top.before, json["data"], "before", "");
+        setIfNotNull(top.modhash, json["data"], "modhash", "");
+        if (json["data"].find("children") != json["data"].end()) {
+            for (auto it = json["data"]["children"].begin(); it != json["data"]["children"].end(); it++) {
+                top.links.push_back(parseLinkT3((*it)["data"]));
+            }
+        }
+    }
+    top.links.shrink_to_fit();
+    return top;
+}
+
+MethodListing::Controversial MethodListing::controversial(const RedditUser& user, const std::string& s) {
+    curl->curlErrors();
+    if (!user.isComplete()) {
+        throw RedditError("RedditUser must be complete");
+    }
+
+    Controversial contro;
+    curl->setHttpHeader("Authorization: bearer " + user.token());
+    RedditUrl url("https://oauth.reddit.com/r/" + s + "/controversial");
+    std::string query_strings = inputsToString();
+    if (!query_strings.empty()) {
+        url.addQueryString(query_strings);
+    }
+    std::string unparsed = curl->simpleGet(url.url());
+    nlohmann::json json = nlohmann::json::parse(unparsed);
+
+    using detail::setIfNotNull;
+    if (json.find("data") != json.end()) {
+        setIfNotNull(contro.after, json["data"], "after", "");
+        setIfNotNull(contro.before, json["data"], "before", "");
+        setIfNotNull(contro.modhash, json["data"], "modhash", "");
+        if (json["data"].find("children") != json["data"].end()) {
+            for (auto it = json["data"]["children"].begin(); it != json["data"]["children"].end(); it++) {
+                contro.links.push_back(parseLinkT3((*it)["data"]));
+            }
+        }
+    }
+    contro.links.shrink_to_fit();
+    return contro;
+}
 
 std::string MethodListing::inputsToString() const {
     std::string str_inputs;
@@ -117,6 +181,8 @@ std::string MethodListing::inputsToString() const {
         str_inputs.append("before=" + extra_inputs->before + "&");
     if (!extra_inputs->g.empty())
         str_inputs.append("g=" + extra_inputs->g + "&");
+    if (!extra_inputs->t.empty())
+        str_inputs.append("t=" + extra_inputs->t + "&");
     if (!extra_inputs->show.empty())
         str_inputs.append("show=" + extra_inputs->show + "&");
     if (extra_inputs->count > 0)
@@ -139,7 +205,7 @@ void MethodListing::setInputs(const Inputs& inputs) {
     *extra_inputs = inputs;
 }
 
-MethodListing::Inputs& MethodListing::inputs() const {
+MethodListing::Inputs& MethodListing::inputs() {
     return *extra_inputs;
 }
 
