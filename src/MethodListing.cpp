@@ -15,76 +15,9 @@ MethodListing::MethodListing(const detail::Method& m) : extra_inputs(std::make_u
     setDependencyOn(m);
 }
 
-
-MethodListing::Hot MethodListing::hot(const RedditUser& user, const std::string& s) {
-    curl->curlErrors();
-    if (!user.isComplete()) {
-        throw RedditError("RedditUser must be complete");
-    }
-    Hot hot;
-    curl->setHttpHeader("Authorization: bearer " + user.token());
-    RedditUrl url("https://oauth.reddit.com/r/" + s + "/hot");
-    std::string query_strings = inputsToString();
-    if (!query_strings.empty()) {
-        url.addQueryString(query_strings);
-        url.removeQueryString("t");
-    }
-    std::string unparsed = curl->simpleGet(url.url());
-    nlohmann::json json = nlohmann::json::parse(unparsed);
-
-    using detail::setIfNotNull;
-    if (json.find("data") != json.end()) {
-        setIfNotNull(hot.after, json["data"], "after", "");
-        setIfNotNull(hot.before, json["data"], "before", "");
-        setIfNotNull(hot.modhash, json["data"], "modhash", "");
-        if (json["data"].find("children") != json["data"].end()) {
-            for (auto it = json["data"]["children"].begin(); it != json["data"]["children"].end(); it++) {
-                hot.links.push_back(parseLinkT3((*it)["data"]));
-            }
-        }
-    }
-    hot.links.shrink_to_fit();
-    return hot;
-}
-
-MethodListing::New MethodListing::_new(const RedditUser& user, const std::string& s) {
-    curl->emptyErrors();
-    if (!user.isComplete()) {
-        throw RedditError("RedditUser must be complete");
-    }
-    New local_new;
-    curl->setHttpHeader("Authorization: bearer " + user.token());
-    RedditUrl url("https://oauth.reddit.com/r/" + s + "/new");
-    std::string query_strings = inputsToString();
-    if (!query_strings.empty()) {
-        url.addQueryString(query_strings);
-        url.removeQueryString("t");
-    }
-    std::string unparsed = curl->simpleGet(url.url());
-    nlohmann::json json = nlohmann::json::parse(unparsed);
-
-    using detail::setIfNotNull;
-    if (json.find("data") != json.end()) {
-        setIfNotNull(local_new.after, json["data"], "after", "");
-        setIfNotNull(local_new.before, json["data"], "before", "");
-        setIfNotNull(local_new.modhash, json["data"], "modhash", "");
-        if (json["data"].find("children") != json["data"].end()) {
-            for (auto it = json["data"]["children"].begin(); it != json["data"]["children"].end(); it++) {
-                local_new.links.push_back(parseLinkT3((*it)["data"]));
-            }
-        }
-    }
-    local_new.links.shrink_to_fit();
-    return local_new;
-}
-
 MethodListing::Random MethodListing::random(const RedditUser& user, const std::string& s) {
-    curl->emptyErrors();
-    if (!user.isComplete()) {
-        throw RedditError("RedditUser must be complete");
-    }
+    setToken(user);
     Random random;
-    curl->setHttpHeader("Authorization: bearer " + user.token());
     std::string url("https://oauth.reddit.com/r/" + s + "/random");
     std::string unparsed = curl->simpleGet(url);
     nlohmann::json json = nlohmann::json::parse(unparsed);
@@ -112,65 +45,92 @@ MethodListing::Random MethodListing::random(const RedditUser& user, const std::s
     return random;
 }
 
-MethodListing::Top MethodListing::top(const RedditUser &user , const std::string &s) {
-    curl->curlErrors();
-    if (!user.isComplete()) {
-        throw RedditError("RedditUser must be complete");
+MethodListing::T3Listing MethodListing::hot(const RedditUser& user, const std::string& s) {
+    setToken(user);
+    RedditUrl url("https://oauth.reddit.com/r/" + s + "/hot");
+    std::string query_strings = inputsToString();
+    if (!query_strings.empty()) {
+        url.addQueryString(query_strings);
+        url.removeQueryString("t");
     }
-    Top top;
-    curl->setHttpHeader("Authorization: bearer " + user.token());
+
+    T3Listing list;
+    std::string unparsed = curl->simpleGet(url.url());
+    nlohmann::json json = nlohmann::json::parse(unparsed);
+
+    parseT3Object(list, json);
+
+    return list;
+}
+
+MethodListing::T3Listing MethodListing::_new(const RedditUser& user, const std::string& s) {
+    setToken(user);
+    RedditUrl url("https://oauth.reddit.com/r/" + s + "/new");
+    std::string query_strings = inputsToString();
+    if (!query_strings.empty()) {
+        url.addQueryString(query_strings);
+        url.removeQueryString("t");
+    }
+
+    T3Listing list;
+    std::string unparsed = curl->simpleGet(url.url());
+    nlohmann::json json = nlohmann::json::parse(unparsed);
+
+    parseT3Object(list, json);
+
+    return list;
+}
+
+MethodListing::T3Listing MethodListing::top(const RedditUser &user , const std::string &s) {
+    setToken(user);
     RedditUrl url("https://oauth.reddit.com/r/" + s + "/top");
     std::string query_strings = inputsToString();
     if (!query_strings.empty()) {
         url.addQueryString(query_strings);
     }
+
+    T3Listing list;
     std::string unparsed = curl->simpleGet(url.url());
     nlohmann::json json = nlohmann::json::parse(unparsed);
 
-    using detail::setIfNotNull;
-    if (json.find("data") != json.end()) {
-        setIfNotNull(top.after, json["data"], "after", "");
-        setIfNotNull(top.before, json["data"], "before", "");
-        setIfNotNull(top.modhash, json["data"], "modhash", "");
-        if (json["data"].find("children") != json["data"].end()) {
-            for (auto it = json["data"]["children"].begin(); it != json["data"]["children"].end(); it++) {
-                top.links.push_back(parseLinkT3((*it)["data"]));
-            }
-        }
-    }
-    top.links.shrink_to_fit();
-    return top;
+    parseT3Object(list, json);
+
+    return list;
 }
 
-MethodListing::Controversial MethodListing::controversial(const RedditUser& user, const std::string& s) {
-    curl->curlErrors();
-    if (!user.isComplete()) {
-        throw RedditError("RedditUser must be complete");
-    }
-
-    Controversial contro;
-    curl->setHttpHeader("Authorization: bearer " + user.token());
+MethodListing::T3Listing MethodListing::controversial(const RedditUser& user, const std::string& s) {
+    setToken(user);
     RedditUrl url("https://oauth.reddit.com/r/" + s + "/controversial");
     std::string query_strings = inputsToString();
     if (!query_strings.empty()) {
         url.addQueryString(query_strings);
     }
+
+    T3Listing list;
     std::string unparsed = curl->simpleGet(url.url());
     nlohmann::json json = nlohmann::json::parse(unparsed);
 
-    using detail::setIfNotNull;
-    if (json.find("data") != json.end()) {
-        setIfNotNull(contro.after, json["data"], "after", "");
-        setIfNotNull(contro.before, json["data"], "before", "");
-        setIfNotNull(contro.modhash, json["data"], "modhash", "");
-        if (json["data"].find("children") != json["data"].end()) {
-            for (auto it = json["data"]["children"].begin(); it != json["data"]["children"].end(); it++) {
-                contro.links.push_back(parseLinkT3((*it)["data"]));
-            }
-        }
+    parseT3Object(list, json);
+
+    return list;
+}
+
+MethodListing::T3Listing MethodListing::rising(const RedditUser& user, const std::string& s) {
+    setToken(user);
+    RedditUrl url("https://oauth.reddit.com/r/" + s + "/rising");
+    std::string query_strings = inputsToString();
+    if (!query_strings.empty()) {
+        url.addQueryString(query_strings);
+        url.removeQueryString("t");
     }
-    contro.links.shrink_to_fit();
-    return contro;
+
+    T3Listing list;
+    std::string unparsed = curl->simpleGet(url.url());
+    nlohmann::json json = nlohmann::json::parse(unparsed);
+
+    parseT3Object(list, json);
+
+    return list;
 }
 
 std::string MethodListing::inputsToString() const {
@@ -213,7 +173,20 @@ void MethodListing::resetInputs() {
     *extra_inputs = Inputs();
 }
 
-
+void MethodListing::parseT3Object(T3Listing& dest, nlohmann::json& json) const {
+    using detail::setIfNotNull;
+    if (json.find("data") != json.end()) {
+        setIfNotNull(dest.after, json["data"], "after", "");
+        setIfNotNull(dest.before, json["data"], "before", "");
+        setIfNotNull(dest.modhash, json["data"], "modhash", "");
+        if (json["data"].find("children") != json["data"].end()) {
+            for (auto it = json["data"]["children"].begin(); it != json["data"]["children"].end(); it++) {
+                dest.links.push_back(parseLinkT3((*it)["data"]));
+            }
+        }
+    }
+    dest.links.shrink_to_fit();
+}
 
 MethodListing::Comment MethodListing::parseCommentT1(const nlohmann::json& json_obj) const {
     Comment comment;
@@ -271,7 +244,6 @@ MethodListing::Comment MethodListing::parseCommentT1(const nlohmann::json& json_
 
     return comment;
 }
-
 
 MethodListing::Link MethodListing::parseLinkT3(const nlohmann::json& json_obj) const {
     MethodListing::Link link;
@@ -339,7 +311,12 @@ MethodListing::Link MethodListing::parseLinkT3(const nlohmann::json& json_obj) c
     return link;
 }
 
-
+inline void MethodListing::setToken(const RedditUser& user) {
+    if (!user.isComplete()) {
+        throw RedditError("RedditUser must be complete");
+    }
+    curl->setHttpHeader("Authorization: bearer " + user.token());
+}
 
 
 } //! redd namsepace

@@ -27,11 +27,8 @@ public:
     struct Subreddit;
     struct Award;
 
-    struct Hot;
-    struct New;
     struct Random;
-    struct Top;
-    struct Controversial;
+    struct T3Listing;
 
 
     explicit MethodListing()
@@ -43,17 +40,20 @@ public:
     void resetInputs();
     Inputs& inputs();
 
-    New _new(const RedditUser&, const std::string& s);
-    Hot hot(const RedditUser&, const std::string& s);
+    T3Listing _new(const RedditUser&, const std::string& s);
+    T3Listing hot(const RedditUser&, const std::string& s);
     Random random(const RedditUser&, const std::string&);
-    Top top(const RedditUser&, const std::string& s);
-    Controversial controversial(const RedditUser&, const std::string& s);
+    T3Listing top(const RedditUser&, const std::string& s);
+    T3Listing controversial(const RedditUser&, const std::string& s);
+    T3Listing rising(const RedditUser&, const std::string& s);
 private:
     std::unique_ptr<Inputs> extra_inputs;
 
     Link parseLinkT3(const nlohmann::json&) const;
     Comment parseCommentT1(const nlohmann::json&) const;
     std::string inputsToString() const;
+    void parseT3Object(T3Listing& dest, nlohmann::json& json) const;
+    inline void setToken(const RedditUser&);
 };
 
 struct MethodListing::Inputs {
@@ -153,14 +153,7 @@ struct MethodListing::Comment {
     bool stickied;
 };
 
-struct MethodListing::Hot {
-    std::string after;
-    std::string before;
-    std::vector<Link> links;
-    std::string modhash;
-};
-
-struct MethodListing::New {
+struct MethodListing::T3Listing {
     std::string after;
     std::string before;
     std::vector<Link> links;
@@ -170,20 +163,6 @@ struct MethodListing::New {
 struct MethodListing::Random {
     Link link;
     std::vector<Comment> comments;
-};
-
-struct MethodListing::Top {
-    std::string after;
-    std::string before;
-    std::vector<Link> links;
-    std::string modhash;
-};
-
-struct MethodListing::Controversial {
-    std::string after;
-    std::string before;
-    std::vector<Link> links;
-    std::string modhash;
 };
 
 } //! redd namespace
