@@ -96,6 +96,7 @@ void Curl::appendHeader(const char* str) {
 
 void Curl::emptyHttpHeader() {
     curl_slist_free_all(header_list);
+    header_list = curl_slist_append(NULL, "");
 }
 
 std::string Curl::curlErrors() const {
