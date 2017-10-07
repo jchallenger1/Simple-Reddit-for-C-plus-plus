@@ -10,15 +10,9 @@
 
 namespace redd {
 
-/*
- * In this class currently, there are many structs and functions that
- * do similar work making a lot unneccesary. However the class should first get all
- * listing api methods working before working on connecting them together.
- */
-
 class MethodListing : public detail::Method {
 public:
-    struct Inputs;
+    struct Inputs; // representation of query strings user is able to input.
 
     struct Comment; // type prefix for T1
     struct Link;    // type prefix for T3
@@ -36,8 +30,7 @@ public:
     struct T3Listing;
 
     // constructors
-    explicit MethodListing()
-        : detail::Method(), extra_inputs(std::make_unique<Inputs>()) {}
+    explicit MethodListing() : detail::Method(), extra_inputs(std::make_unique<Inputs>()) {}
     MethodListing(const detail::Method& m);
 
     // functions for inputs
@@ -45,11 +38,18 @@ public:
     void resetInputs();
     Inputs& inputs();
 
-    // function endpoints
+    // *** function endpoints ***
+    // missing /api/trending_subreddits
+
+    // calls [/r/subreddit]/comments/article
     PostCommentPair commentTree(const RedditUser&, const std::string& subreddit, const std::string& id);
+    // calls [/r/subreddit]/random
+    PostCommentPair random(const RedditUser&, const std::string& subreddit); // this function may not work at times
+    // calls /by_id/names
     Link by_id(const RedditUser&, const std::string& fullname);
-    PostCommentPair random(const RedditUser&, const std::string& subreddit);
+    // calls /duplicates/article
     std::vector<Link> duplicates(const RedditUser&, const std::string& id); // id is not the fullname!, ex : 74pqir
+    // rests calls [/r/subreddit]/new, [/r/subreddit]/hot ...
     T3Listing _new(const RedditUser&, const std::string& subreddit);
     T3Listing hot(const RedditUser&, const std::string& subreddit);
     T3Listing top(const RedditUser&, const std::string& subreddit);
@@ -61,21 +61,31 @@ private:
     Link parseLinkT3(const nlohmann::json&) const;
     Comment parseCommentT1(const nlohmann::json&) const;
     std::string inputsToString() const;
-    void parseT3Object(T3Listing& dest, nlohmann::json& json) const;
-    void parsePairObject(PostCommentPair& dest, nlohmann::json& t3, nlohmann::json& t1) const;
+    void parseT3Object(T3Listing& dest, const nlohmann::json& json) const;
+    void parsePairObject(PostCommentPair& dest, const nlohmann::json& t3, const nlohmann::json& t1) const;
     inline void setToken(const RedditUser&);
 };
 
 struct MethodListing::Inputs {
     std::string after;
+    std::string article;
     std::string before;
+    std::string comment;
     std::string g;
     std::string t;
     std::string show;
+    std::string sort;
     int count;
+    int depth;
     int limit;
+    short context;
+    short truncate;
+    bool showedits;
+    bool showmore;
     bool sr_detail;
+    bool threaded;
 };
+
 
 struct MethodListing::Link {
     std::string author;
@@ -174,6 +184,22 @@ struct MethodListing::PostCommentPair {
     Link link;
     std::vector<Comment> comments;
 };
+
+// ********************
+// Non Member Functions
+// ********************
+
+bool operator ==(const MethodListing::Link& lhs, const MethodListing::Link& rhs);
+bool operator !=(const MethodListing::Link& lhs, const MethodListing::Link& rhs);
+
+bool operator ==(const MethodListing::Comment& lhs, const MethodListing::Comment& rhs);
+bool operator !=(const MethodListing::Comment& lhs, const MethodListing::Comment& rhs);
+
+bool operator ==(const MethodListing::T3Listing& lhs, const MethodListing::T3Listing& rhs);
+bool operator !=(const MethodListing::T3Listing& lhs, const MethodListing::T3Listing& rhs);
+
+bool operator ==(const MethodListing::PostCommentPair& lhs, const MethodListing::PostCommentPair& rhs);
+bool operator !=(const MethodListing::PostCommentPair& lhs, const MethodListing::PostCommentPair& rhs);
 
 } //! redd namespace
 

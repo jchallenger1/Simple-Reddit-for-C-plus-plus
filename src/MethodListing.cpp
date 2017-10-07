@@ -11,9 +11,11 @@
 
 namespace redd {
 
+// Function delgates all networking onto other.
 MethodListing::MethodListing(const detail::Method& m) : extra_inputs(std::make_unique<Inputs>()) {
     setDependencyOn(m);
 }
+
 
 MethodListing::Link MethodListing::by_id(const RedditUser& user, const std::string& fullname) {
     setToken(user);
@@ -64,8 +66,6 @@ std::vector<MethodListing::Link> MethodListing::duplicates(const RedditUser& use
     std::string query_strings = inputsToString();
     if (!query_strings.empty()) {
         url.addQueryString(query_strings);
-        url.removeQueryString("t");
-        url.removeQueryString("g");
     }
     std::string unparsed = curl->simpleGet(url.url());
     nlohmann::json json = nlohmann::json::parse(unparsed);
@@ -89,7 +89,6 @@ MethodListing::T3Listing MethodListing::hot(const RedditUser& user, const std::s
     std::string query_strings = inputsToString();
     if (!query_strings.empty()) {
         url.addQueryString(query_strings);
-        url.removeQueryString("t");
     }
 
     T3Listing list;
@@ -107,7 +106,6 @@ MethodListing::T3Listing MethodListing::_new(const RedditUser& user, const std::
     std::string query_strings = inputsToString();
     if (!query_strings.empty()) {
         url.addQueryString(query_strings);
-        url.removeQueryString("t");
     }
 
     T3Listing list;
@@ -159,7 +157,6 @@ MethodListing::T3Listing MethodListing::rising(const RedditUser& user, const std
     std::string query_strings = inputsToString();
     if (!query_strings.empty()) {
         url.addQueryString(query_strings);
-        url.removeQueryString("t");
     }
 
     T3Listing list;
@@ -171,24 +168,51 @@ MethodListing::T3Listing MethodListing::rising(const RedditUser& user, const std
     return list;
 }
 
+// Accesses extra_inputs and accumulates a string containing
+// query strings for each existing key of Inputs struct.
 std::string MethodListing::inputsToString() const {
     std::string str_inputs;
+    // String values
     if (!extra_inputs->after.empty())
         str_inputs.append("after=" + extra_inputs->after + "&");
+    if (!extra_inputs->article.empty())
+        str_inputs.append("article=" + extra_inputs->article + "&");
     if (!extra_inputs->before.empty())
         str_inputs.append("before=" + extra_inputs->before + "&");
+    if (!extra_inputs->comment.empty())
+        str_inputs.append("comment=" + extra_inputs->comment + "&");
     if (!extra_inputs->g.empty())
         str_inputs.append("g=" + extra_inputs->g + "&");
     if (!extra_inputs->t.empty())
         str_inputs.append("t=" + extra_inputs->t + "&");
     if (!extra_inputs->show.empty())
         str_inputs.append("show=" + extra_inputs->show + "&");
+    if (!extra_inputs->sort.empty())
+        str_inputs.append("sort=" + extra_inputs->sort + "&");
+
+    // Integer Values
     if (extra_inputs->count > 0)
         str_inputs.append("count=" + std::to_string(extra_inputs->count) + "&");
+    if (extra_inputs->depth > 0)
+        str_inputs.append("depth=" + std::to_string(extra_inputs->depth) + "&");
     if (extra_inputs->limit > 0)
         str_inputs.append("limit=" + std::to_string(extra_inputs->limit) + "&");
+
+    // Short Values
+    if (extra_inputs->context > 0 && extra_inputs->context < 9)
+        str_inputs.append("context=" + std::to_string(extra_inputs->context) + "&");
+    if (extra_inputs->truncate > 0 && extra_inputs->truncate < 51)
+        str_inputs.append("context=" + std::to_string(extra_inputs->truncate) + "&");
+
+    // Boolean Values
+    if (extra_inputs->showedits)
+        str_inputs.append("showedits=true&");
+    if (extra_inputs->showmore)
+        str_inputs.append("showmore=true&");
     if (extra_inputs->sr_detail)
-        str_inputs.append("sr_detail=true");
+        str_inputs.append("sr_detail=true&");
+    if (extra_inputs->threaded)
+        str_inputs.append("threaded=true");
 
     auto iter = std::find(str_inputs.crbegin(), str_inputs.crend(), '&').base();
     if (str_inputs.end() - iter >= 3) {
@@ -211,7 +235,8 @@ void MethodListing::resetInputs() {
     *extra_inputs = Inputs();
 }
 
-void MethodListing::parseT3Object(T3Listing& dest, nlohmann::json& json) const {
+
+void MethodListing::parseT3Object(T3Listing& dest, const nlohmann::json& json) const {
     using detail::setIfNotNull;
     if (json.find("data") != json.end()) {
         setIfNotNull(dest.after, json["data"], "after", "");
@@ -348,6 +373,7 @@ MethodListing::Link MethodListing::parseLinkT3(const nlohmann::json& json_obj) c
     return link;
 }
 
+// function changes the curl object in this by adding a header
 inline void MethodListing::setToken(const RedditUser& user) {
     if (!user.isComplete()) {
         throw RedditError("RedditUser must be complete");
@@ -355,7 +381,7 @@ inline void MethodListing::setToken(const RedditUser& user) {
     curl->setHttpHeader("Authorization: bearer " + user.token());
 }
 
-void MethodListing::parsePairObject(PostCommentPair& dest, nlohmann::json& t3, nlohmann::json& t1) const {
+void MethodListing::parsePairObject(PostCommentPair& dest, const nlohmann::json& t3, const nlohmann::json& t1) const {
     if (t3.find("data") != t3.end()) {
         if (t3["data"]["children"].size() != 1) {// there is always only one t3 object.
             throw RedditError("An error has occured parsing, no T3 object found.");
@@ -371,6 +397,51 @@ void MethodListing::parsePairObject(PostCommentPair& dest, nlohmann::json& t3, n
     }
     dest.comments.shrink_to_fit();
 }
+
+
+// *******************
+// Non Member Funcions
+// *******************
+
+bool operator ==(const MethodListing::Link& lhs, const MethodListing::Link& rhs) {
+    return lhs.author == rhs.author && lhs.id == rhs.id && lhs.name == rhs.name &&
+            lhs.subreddit_id == rhs.subreddit_id && lhs.title == rhs.title && rhs.url == lhs.url &&
+            lhs.created_utc == rhs.created_utc && lhs.score == rhs.score;
+}
+
+bool operator !=(const MethodListing::Link& lhs, const MethodListing::Link& rhs) {
+    return !(lhs == rhs);
+}
+
+bool operator ==(const MethodListing::Comment& lhs, const MethodListing::Comment& rhs) {
+    return lhs.children.size() == rhs.children.size() && lhs.author == rhs.author && lhs.id == rhs.id &&
+            lhs.link_id == rhs.link_id && lhs.parent_id == rhs.parent_id &&
+            lhs.subreddit_id == rhs.subreddit_id && lhs.created_utc == rhs.created_utc;
+}
+
+bool operator !=(const MethodListing::Comment& lhs, const MethodListing::Comment& rhs) {
+    return !(lhs == rhs);
+}
+
+bool operator ==(const MethodListing::T3Listing& lhs, const MethodListing::T3Listing& rhs) {
+    return lhs.after == rhs.after && lhs.before == rhs.before
+            && lhs.links == rhs.links && lhs.modhash == rhs.modhash;
+}
+
+bool operator !=(const MethodListing::T3Listing& lhs, const MethodListing::T3Listing& rhs) {
+    return !(lhs == rhs);
+}
+
+bool operator ==(const MethodListing::PostCommentPair& lhs, const MethodListing::PostCommentPair& rhs) {
+    return lhs.link == rhs.link && lhs.comments == rhs.comments;
+}
+
+bool operator !=(const MethodListing::PostCommentPair& lhs, const MethodListing::PostCommentPair& rhs) {
+    return !(lhs == rhs);
+}
+
+
+
 
 
 } //! redd namsepace
