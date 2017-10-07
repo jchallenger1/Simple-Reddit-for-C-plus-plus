@@ -26,10 +26,6 @@ Curl::~Curl() {
     curl_global_cleanup();
 }
 
-/*Curl::Curl(const Curl& other)
-    : header_list(other.header_list), curl(other.curl), user_agent(other.user_agent) {
-    std::strcpy(this->curl_error,other.curl_error);
-}*/
 
 std::string Curl::simplePost(const std::string& url, const RedditUser& user, const std::string post_fields) {
 

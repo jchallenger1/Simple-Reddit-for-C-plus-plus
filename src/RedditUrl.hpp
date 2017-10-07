@@ -45,6 +45,8 @@ public:
 
     void addJson();
 
+    bool hasQueryString(const std::string& key);
+
     void removeQueryString(const std::string& key);
 
     void addQueryString(const std::string& str);

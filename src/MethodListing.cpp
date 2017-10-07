@@ -15,9 +15,38 @@ MethodListing::MethodListing(const detail::Method& m) : extra_inputs(std::make_u
     setDependencyOn(m);
 }
 
-MethodListing::Random MethodListing::random(const RedditUser& user, const std::string& s) {
+MethodListing::Link MethodListing::by_id(const RedditUser& user, const std::string& fullname) {
     setToken(user);
-    Random random;
+    std::string url("https://oauth.reddit.com/by_id/" + fullname);
+    std::string unparsed = curl->simpleGet(url);
+    nlohmann::json json = nlohmann::json::parse(unparsed);
+    Link link;
+    if (json.find("data") != json.end()) {
+        if (!json["data"]["children"].empty()) {
+            link = parseLinkT3(json["data"]["children"][0]["data"]);
+        }
+    }
+    return link;
+}
+
+MethodListing::PostCommentPair MethodListing::commentTree
+    (const RedditUser& user, const std::string& subreddit, const std::string& id) {
+    setToken(user);
+    PostCommentPair tree;
+    RedditUrl url("https://oauth.reddit.com/r/" + subreddit + "/comments/" + id);
+    std::string unparsed = curl->simpleGet(url.url());
+    nlohmann::json json = nlohmann::json::parse(unparsed);
+    // object comes in form of an array always with size 2.
+    if (json.size() != 2) {
+        throw RedditError("An error has occured in parsing /r/" + subreddit + "/comments/" + id + " endpoint.");
+    }
+    parsePairObject(tree, json[0], json[1]);
+    return tree;
+}
+
+MethodListing::PostCommentPair MethodListing::random(const RedditUser& user, const std::string& s) {
+    setToken(user);
+    PostCommentPair random;
     std::string url("https://oauth.reddit.com/r/" + s + "/random");
     std::string unparsed = curl->simpleGet(url);
     nlohmann::json json = nlohmann::json::parse(unparsed);
@@ -25,24 +54,33 @@ MethodListing::Random MethodListing::random(const RedditUser& user, const std::s
     if (json.size() != 2) {
         throw RedditError("An error has occured in parsing /api/random endpoint.");
     }
-
-    if (json[0]["data"].find("children") != json[0]["data"].end()) {
-        auto& t3 = json[0]["data"]["children"];
-        if (t3.size() != 1) {// there is always only one t3 object.
-            throw RedditError("An error has occured parsing, no T3 object found.");
-        }
-        else {
-            random.link = parseLinkT3(t3[0]);
-        }
-    }
-
-    if (json[1]["data"].find("children") != json[1]["data"].end()) {
-        for (auto& t1_it : json[1]["data"]["children"]) {
-            random.comments.push_back(parseCommentT1(t1_it));
-        }
-    }
-
+    parsePairObject(random, json[0], json[1]);
     return random;
+}
+
+std::vector<MethodListing::Link> MethodListing::duplicates(const RedditUser& user, const std::string& id) {
+    setToken(user);
+    RedditUrl url("https://oauth.reddit.com/duplicates/" + id);
+    std::string query_strings = inputsToString();
+    if (!query_strings.empty()) {
+        url.addQueryString(query_strings);
+        url.removeQueryString("t");
+        url.removeQueryString("g");
+    }
+    std::string unparsed = curl->simpleGet(url.url());
+    nlohmann::json json = nlohmann::json::parse(unparsed);
+    std::vector<Link> listings;
+
+    for (auto& t3_object : json) {
+        if (t3_object.find("data") != t3_object.end()) {
+            for (auto& t3 : t3_object["data"]["children"]) {
+                listings.push_back(parseLinkT3(t3["data"]) );
+            }
+        }
+    }
+
+    listings.shrink_to_fit();
+    return listings;
 }
 
 MethodListing::T3Listing MethodListing::hot(const RedditUser& user, const std::string& s) {
@@ -226,7 +264,6 @@ MethodListing::Comment MethodListing::parseCommentT1(const nlohmann::json& json_
     setIfNotNull(comment.can_gild, json_obj, "can_gild", false);
     setIfNotNull(comment.can_mod_post, json_obj, "can_mod_post", false);
     setIfNotNull(comment.collapsed, json_obj, "collapsed", false);
-    setIfNotNull(comment.edited, json_obj, "edited", false);
     setIfNotNull(comment.is_sumbitter, json_obj, "is_sumbitter", false);
     setIfNotNull(comment.saved, json_obj, "saved", false);
     setIfNotNull(comment.stickied, json_obj, "stickied", false);
@@ -236,7 +273,7 @@ MethodListing::Comment MethodListing::parseCommentT1(const nlohmann::json& json_
             auto child_array = json_obj["replies"]["data"].find("children");
             if (child_array != json_obj["replies"]["data"].end()) {
                 for (auto& child : *child_array) {
-                    comment.children.push_back(parseCommentT1(child));
+                    comment.children.push_back(parseCommentT1(child["data"]));
                 }
             }
         }
@@ -316,6 +353,23 @@ inline void MethodListing::setToken(const RedditUser& user) {
         throw RedditError("RedditUser must be complete");
     }
     curl->setHttpHeader("Authorization: bearer " + user.token());
+}
+
+void MethodListing::parsePairObject(PostCommentPair& dest, nlohmann::json& t3, nlohmann::json& t1) const {
+    if (t3.find("data") != t3.end()) {
+        if (t3["data"]["children"].size() != 1) {// there is always only one t3 object.
+            throw RedditError("An error has occured parsing, no T3 object found.");
+        }
+        else {
+            dest.link = parseLinkT3(t3["data"]["children"][0]["data"]);
+        }
+    }
+    if (t1.find("data") != t1.end()) {
+        for (auto& t1_obj : t1["data"]["children"]) {
+            dest.comments.push_back(parseCommentT1(t1_obj["data"]));
+        }
+    }
+    dest.comments.shrink_to_fit();
 }
 
 

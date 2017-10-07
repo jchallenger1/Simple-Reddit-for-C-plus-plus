@@ -84,6 +84,10 @@ void RedditUrl::resetToBase() {
     return_url = base_url;
 }
 
+bool RedditUrl::hasQueryString(const std::string& key) {
+    return std::regex_search(return_url, std::regex(key + "=.+"));
+}
+
 void RedditUrl::addJson() {// add .json onto the url at end of the url in format /r/.../.json?...
     bool has_json = std::regex_search(return_url, std::regex("\\.json")); // make sure json isn't already there.
     if (!has_json) {

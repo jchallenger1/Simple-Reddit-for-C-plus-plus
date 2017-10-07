@@ -21,31 +21,40 @@ public:
     struct Inputs;
 
     struct Comment; // type prefix for T1
-    struct Account; // T2
-    struct Link;    // T3...
-    struct Message;
-    struct Subreddit;
-    struct Award;
+    struct Link;    // type prefix for T3
 
-    struct Random;
+    /* Represention of the the structure :
+     *  [ { T3 object
+     *      {Link(one)}
+     *    }
+     *    [
+     *      T1 object
+     *    ]
+     *  ]
+     */
+    struct PostCommentPair;
     struct T3Listing;
 
-
+    // constructors
     explicit MethodListing()
         : detail::Method(), extra_inputs(std::make_unique<Inputs>()) {}
     MethodListing(const detail::Method& m);
 
-
+    // functions for inputs
     void setInputs(const Inputs&);
     void resetInputs();
     Inputs& inputs();
 
-    T3Listing _new(const RedditUser&, const std::string& s);
-    T3Listing hot(const RedditUser&, const std::string& s);
-    Random random(const RedditUser&, const std::string&);
-    T3Listing top(const RedditUser&, const std::string& s);
-    T3Listing controversial(const RedditUser&, const std::string& s);
-    T3Listing rising(const RedditUser&, const std::string& s);
+    // function endpoints
+    PostCommentPair commentTree(const RedditUser&, const std::string& subreddit, const std::string& id);
+    Link by_id(const RedditUser&, const std::string& fullname);
+    PostCommentPair random(const RedditUser&, const std::string& subreddit);
+    std::vector<Link> duplicates(const RedditUser&, const std::string& id); // id is not the fullname!, ex : 74pqir
+    T3Listing _new(const RedditUser&, const std::string& subreddit);
+    T3Listing hot(const RedditUser&, const std::string& subreddit);
+    T3Listing top(const RedditUser&, const std::string& subreddit);
+    T3Listing controversial(const RedditUser&, const std::string& subreddit);
+    T3Listing rising(const RedditUser&, const std::string& subreddit);
 private:
     std::unique_ptr<Inputs> extra_inputs;
 
@@ -53,6 +62,7 @@ private:
     Comment parseCommentT1(const nlohmann::json&) const;
     std::string inputsToString() const;
     void parseT3Object(T3Listing& dest, nlohmann::json& json) const;
+    void parsePairObject(PostCommentPair& dest, nlohmann::json& t3, nlohmann::json& t1) const;
     inline void setToken(const RedditUser&);
 };
 
@@ -160,7 +170,7 @@ struct MethodListing::T3Listing {
     std::string modhash;
 };
 
-struct MethodListing::Random {
+struct MethodListing::PostCommentPair {
     Link link;
     std::vector<Comment> comments;
 };
