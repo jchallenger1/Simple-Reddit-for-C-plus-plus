@@ -22,7 +22,9 @@ MethodListing::Link MethodListing::by_id(const RedditUser& user, const std::stri
     setToken(user);
     std::string url("https://oauth.reddit.com/by_id/" + fullname);
     std::string unparsed = curl->simpleGet(url);
-    nlohmann::json json = nlohmann::json::parse(unparsed);
+    nlohmann::json json;
+    strToJson(unparsed, json);
+
     Link link;
     if (json.find("data") != json.end()) {
         if (!json["data"]["children"].empty()) {
@@ -39,7 +41,9 @@ MethodListing::PostCommentPair MethodListing::commentTree
     PostCommentPair tree;
     RedditUrl url("https://oauth.reddit.com/r/" + subreddit + "/comments/" + id);
     std::string unparsed = curl->simpleGet(url.url());
-    nlohmann::json json = nlohmann::json::parse(unparsed);
+    nlohmann::json json;
+    strToJson(unparsed, json);
+
     // object comes in form of an array always with size 2.
     if (json.size() != 2) {
         throw RedditError("An error has occured in parsing /r/" + subreddit + "/comments/" + id + " endpoint.");
@@ -54,7 +58,9 @@ MethodListing::PostCommentPair MethodListing::random(const RedditUser& user, con
     PostCommentPair random;
     std::string url("https://oauth.reddit.com/r/" + s + "/random");
     std::string unparsed = curl->simpleGet(url);
-    nlohmann::json json = nlohmann::json::parse(unparsed);
+    nlohmann::json json;
+    strToJson(unparsed, json);
+
     // object comes in form of an array always with size 2.
     if (json.size() != 2) {
         throw RedditError("An error has occured in parsing /api/random endpoint.");
@@ -72,7 +78,8 @@ std::vector<MethodListing::Link> MethodListing::duplicates(const RedditUser& use
         url.addQueryString(query_strings);
     }
     std::string unparsed = curl->simpleGet(url.url());
-    nlohmann::json json = nlohmann::json::parse(unparsed);
+    nlohmann::json json;
+    strToJson(unparsed, json);
     std::vector<Link> listings;
 
     for (auto& t3_object : json) {
@@ -98,7 +105,8 @@ MethodListing::T3Listing MethodListing::hot(const RedditUser& user, const std::s
 
     T3Listing list;
     std::string unparsed = curl->simpleGet(url.url());
-    nlohmann::json json = nlohmann::json::parse(unparsed);
+    nlohmann::json json;
+    strToJson(unparsed, json);
 
     parseT3Object(list, json);
 
@@ -116,8 +124,8 @@ MethodListing::T3Listing MethodListing::_new(const RedditUser& user, const std::
 
     T3Listing list;
     std::string unparsed = curl->simpleGet(url.url());
-    nlohmann::json json = nlohmann::json::parse(unparsed);
-
+    nlohmann::json json;
+    strToJson(unparsed, json);
     parseT3Object(list, json);
 
     return list;
@@ -134,8 +142,8 @@ MethodListing::T3Listing MethodListing::top(const RedditUser &user , const std::
 
     T3Listing list;
     std::string unparsed = curl->simpleGet(url.url());
-    nlohmann::json json = nlohmann::json::parse(unparsed);
-
+    nlohmann::json json;
+    strToJson(unparsed, json);
     parseT3Object(list, json);
 
     return list;
@@ -152,8 +160,8 @@ MethodListing::T3Listing MethodListing::controversial(const RedditUser& user, co
 
     T3Listing list;
     std::string unparsed = curl->simpleGet(url.url());
-    nlohmann::json json = nlohmann::json::parse(unparsed);
-
+    nlohmann::json json;
+    strToJson(unparsed, json);
     parseT3Object(list, json);
 
     return list;
@@ -170,7 +178,8 @@ MethodListing::T3Listing MethodListing::rising(const RedditUser& user, const std
 
     T3Listing list;
     std::string unparsed = curl->simpleGet(url.url());
-    nlohmann::json json = nlohmann::json::parse(unparsed);
+    nlohmann::json json;
+    strToJson(unparsed, json);
 
     parseT3Object(list, json);
 

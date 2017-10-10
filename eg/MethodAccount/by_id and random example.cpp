@@ -18,7 +18,7 @@ int main() {
     try {
         user.setToken(client.requestToken(user));
     } catch(RedditError& err) {
-        std::cout << err << std::endl;
+        std::cerr << err << std::endl;
     }
 
     std::string id;

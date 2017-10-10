@@ -20,7 +20,8 @@ MethodAccount::Me MethodAccount::me(const RedditUser& user) {
     MethodAccount::Me return_me;
     curl->setHttpHeader("Authorization: bearer " + user.token());
     std::string unparsed = curl->simpleGet("https://oauth.reddit.com/api/v1/me");
-    nlohmann::json json = nlohmann::json::parse(unparsed);
+    nlohmann::json json;
+    strToJson(unparsed, json);
     using detail::setIfNotNull;
 
     // Strings
@@ -64,8 +65,8 @@ MethodAccount::Friends MethodAccount::friends(const RedditUser& user) {
     MethodAccount::Friends friend_entry;
     curl->setHttpHeader("Authorization: bearer " + user.token());
     std::string unparsed = curl->simpleGet("https://oauth.reddit.com/prefs/friends");
-    nlohmann::json json= nlohmann::json::parse(unparsed);
-
+    nlohmann::json json;
+    strToJson(unparsed, json);
 
     using detail::setIfNotNull;
     for (const auto& lists : json) {
@@ -94,8 +95,8 @@ MethodAccount::Blocked MethodAccount::blocked(const RedditUser& user) {
     MethodAccount::Blocked block_entry;
     curl->setHttpHeader("Authorization: bearer " + user.token());
     std::string unparsed = curl->simpleGet("https://oauth.reddit.com/prefs/blocked");
-    nlohmann::json json= nlohmann::json::parse(unparsed);
-
+    nlohmann::json json;
+    strToJson(unparsed, json);
 
     using detail::setIfNotNull;
     if (json.find("data") != json.end()) {
@@ -121,7 +122,8 @@ MethodAccount::Trusted MethodAccount::trusted(const RedditUser& user) {
     MethodAccount::Trusted trust_entry;
     curl->setHttpHeader("Authorization: bearer " + user.token());
     std::string unparsed = curl->simpleGet("https://oauth.reddit.com/prefs/trusted");
-    nlohmann::json json= nlohmann::json::parse(unparsed);
+    nlohmann::json json;
+    strToJson(unparsed, json);
 
     using detail::setIfNotNull;
     if (json.find("data") != json.end()) {
@@ -147,7 +149,8 @@ MethodAccount::Messaging MethodAccount::messaging(const RedditUser& user) {
     MethodAccount::Messaging message_entry;
     curl->setHttpHeader("Authorization: bearer " + user.token());
     std::string unparsed = curl->simpleGet("https://oauth.reddit.com/prefs/messaging");
-    nlohmann::json json= nlohmann::json::parse(unparsed);
+    nlohmann::json json;
+    strToJson(unparsed, json);
 
     using detail::setIfNotNull;
     for (const auto& lists : json) {
@@ -175,7 +178,8 @@ MethodAccount::MeKarma MethodAccount::karma(const RedditUser& user) {
     MethodAccount::MeKarma karma_entry;
     curl->setHttpHeader("Authorization: bearer " + user.token());
     std::string unparsed = curl->simpleGet("https://oauth.reddit.com/api/v1/me/karma");
-    nlohmann::json json= nlohmann::json::parse(unparsed);
+    nlohmann::json json;
+    strToJson(unparsed, json);
 
     using detail::setIfNotNull;
     if (json.find("data") != json.end()) {
@@ -198,7 +202,8 @@ MethodAccount::MePrefs MethodAccount::prefs(const RedditUser & user) {
     MethodAccount::MePrefs pref;
     curl->setHttpHeader("Authorization: bearer " + user.token());
     std::string unparsed = curl->simpleGet("https://oauth.reddit.com/api/v1/me/prefs");
-    nlohmann::json json= nlohmann::json::parse(unparsed);
+    nlohmann::json json;
+    strToJson(unparsed, json);
 
     using detail::setIfNotNull;
     // String types
