@@ -22,18 +22,30 @@ struct IsStrOrPtr_IMPL<char*> : std::true_type {};
 // Returns a bool if T is of type std::string, const char* or char*.
 template<typename T>
 constexpr bool IsStrOrPtr = IsStrOrPtr_IMPL<
-                                typename std::remove_reference<
                                     typename std::decay<T>::type
-                                >::type
                             >::value;
 
 // Returns a bool if T is of type std::string.
 template<typename T>
 constexpr bool IsStr = std::is_same<
                             typename std::remove_const<
-                                typename std::remove_reference<T>::type
+                                typename std::decay<T>::type
                             >::type,
                         std::string>::value;
+
+template<typename ...Conds>
+struct all_ : std::true_type { };
+
+template<typename Cond, typename ...Conds>
+struct all_<Cond, Conds...> :
+std::conditional<Cond::value, all_<Conds...>, std::false_type>::type { };
+
+template<typename T, typename ...Args>
+using is_all_same = all_<std::is_same<T, Args>...>;
+
+template<typename T, typename ...Args>
+using is_all_base_of = all_<std::is_base_of<T, Args>...>;
+
 
 /*
  * Get value from json_obj(of type nhloman::basic_json) and writes to output;

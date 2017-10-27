@@ -28,6 +28,9 @@ public:
 
     std::string simpleGet(const std::string& url); // create a HTTP get request to url
 
+    void setUserAgent(const std::string&);
+    std::string userAgent() const;
+
     template<typename T>
     void setHttpHeader(const T& str);
 

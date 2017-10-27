@@ -16,13 +16,12 @@ public:
     Method(Method& m);
     virtual ~Method() = 0;
 
-    void setDependencyOn(const Method& method) &;
-
-    void createNewHandle() &;
-
 protected:
     std::shared_ptr<detail::Curl> curl;
     std::weak_ptr<detail::Curl> wkptr;
+
+    void setDependencyOn(const Method& method) &;
+    void createNewHandle() &;
 
     void checkJsonErrors(const nlohmann::json& json) const;
     void strToJson(const std::string& src, nlohmann::json& json) const;
@@ -32,6 +31,7 @@ protected:
 
 
 }//! detail namespace
+
 
 }//! redd namespace
 

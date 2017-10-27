@@ -68,6 +68,15 @@ std::string Curl::simpleGet(const std::string &url) {
     return result;
 }
 
+void Curl::setUserAgent(const std::string& s) {
+    user_agent = s;
+}
+
+std::string Curl::userAgent() const {
+    return user_agent;
+}
+
+
 void Curl::appendHeader(const std::string& str) {
     auto colon = std::find(str.cbegin(), str.cend(), ':');
         // must have a colon to be valid.
@@ -84,10 +93,11 @@ void Curl::appendHeader(const std::string& str) {
 
 void Curl::appendHeader(const char* str) {
     auto colon = strchr(str, ':');
+    auto space = strchr(str, ' ');
     if (colon == nullptr || colon == NULL) {
-        throw std::runtime_error("Header must have a \':\' in the format \"Auth : 123\"");
+        throw std::runtime_error("Header must have a \':\' in the format \"Auth: 123\"");
     }
-    else if (std::find(str, colon, ' ') == colon) {
+    else if ((colon - str) >= (space - str) ) {
         throw std::runtime_error("There must be no space between the colon and key! format --> \"Auth: 123\"");
     }
     header_list = curl_slist_append(header_list, str);
@@ -109,12 +119,12 @@ void Curl::emptyErrors() {
 
 
 size_t Curl::writeToFile(void *buffer, size_t size, size_t nmemb, std::ofstream *userp) {
-    userp->write(reinterpret_cast<char*>(buffer), size * nmemb);
+    userp->write(static_cast<char*>(buffer), size * nmemb);
     return size * nmemb;
 }
 
 size_t Curl::writeToString(void *buffer, size_t size, size_t nmemb, std::string *userp) {
-    userp->append(reinterpret_cast<char*>(buffer), size * nmemb);
+    userp->append(static_cast<char*>(buffer), size * nmemb);
     return size * nmemb;
 }
 
