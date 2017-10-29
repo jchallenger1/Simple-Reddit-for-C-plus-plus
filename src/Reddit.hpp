@@ -15,6 +15,8 @@
 #include "RedditUrl.hpp"
 #include "RedditUser.hpp"
 
+#include "ThingTypes.hpp"
+
 #include "MethodAccount.hpp"
 #include "MethodListing.hpp"
 #include "MethodObserver.hpp"
