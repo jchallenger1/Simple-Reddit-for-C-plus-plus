@@ -17,6 +17,7 @@
 
 #include "MethodAccount.hpp"
 #include "MethodListing.hpp"
+#include "MethodObserver.hpp"
 #include "Method.hpp"
 
 #endif

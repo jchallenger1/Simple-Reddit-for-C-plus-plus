@@ -58,7 +58,7 @@ public:
     void addQueryStrings(std::initializer_list<T>&& list);
 
     template<typename Iter>
-    void addQueryStrings(Iter&& begin, Iter&& end);
+    void addQueryStrings(Iter begin, Iter end);
 
 private:
         const std::string base_url; // stripped down url to either the subreddit or the frontpage in the format ...reddit.com/r/.../ or ...reddit.com/
@@ -72,9 +72,7 @@ std::ostream& operator<<(std::ostream&, const RedditUrl& url);
 
 /*  Templates */
 
-/*
- *  All addQueryStrings redirect the work to addQueryString.
-*/
+//All addQueryStrings redirect the work to addQueryString.
 template<typename T>
 void RedditUrl::addQueryStrings(T&& container) {
     static_assert(detail::IsStrOrPtr<typename T::value_type>,
@@ -90,11 +88,11 @@ void RedditUrl::addQueryStrings(std::initializer_list<T>&& list) {
 }
 
 template<typename Iter>
-void RedditUrl::addQueryStrings(Iter&& begin, Iter&& end) {
+void RedditUrl::addQueryStrings(Iter begin, Iter end) {
     static_assert(detail::IsStrOrPtr<typename std::iterator_traits<Iter>::value_type>,
                    "Underlying type of container must be of type std::string or const char*");
     while (begin != end) {
-        addQueryString(*std::forward<Iter>(begin++));
+        addQueryString(*begin++);
     }
 }
 

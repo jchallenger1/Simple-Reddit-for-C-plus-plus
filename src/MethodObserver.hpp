@@ -19,13 +19,7 @@ namespace redd {
 */
 class MethodObserver final : private detail::Method {
 public:
-    template<typename ...Meths>
-    MethodObserver(Meths&... methods) {
-        if (sizeof...(methods) > 0) {
-            registerMethod(methods...);
-        }
-    }
-
+    MethodObserver() = default;
     ~MethodObserver() {
         while (!observers.empty()) {
             removeMethod(observers.begin()->second.get());
@@ -61,11 +55,10 @@ private:
     }
 };
 
-
 template<typename T>
 void MethodObserver::registerMethod(T& method) {
     static_assert(std::is_base_of<Method, T>::value,
-                  "Function's parameters must be all methods.");
+                  "Function's parameters must be all reddit methods.");
     if (!isRegistered(method)) {
         method.setDependencyOn(*this);
         observers.emplace(std::make_pair(addressOf(method), std::ref(method)));

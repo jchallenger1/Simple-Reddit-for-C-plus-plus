@@ -8,9 +8,11 @@
 
 namespace redd {
 
-namespace detail {
+class MethodObserver;
 
+namespace detail {
 class Method {
+    friend class ::redd::MethodObserver;
 public:
     explicit Method() : curl(std::make_shared<detail::Curl>()), wkptr(curl) {}
     Method(Method& m);
