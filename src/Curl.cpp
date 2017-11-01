@@ -28,6 +28,7 @@ Curl::~Curl() {
 
 
 std::string Curl::simplePost(const std::string& url, const RedditUser& user, const std::string post_fields) {
+    emptyHttpHeader();
 
     std::string result;
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -50,6 +51,7 @@ std::string Curl::simplePost(const std::string& url, const RedditUser& user, con
 }
 
 std::string Curl::simpleGet(const std::string &url) {
+    emptyHttpHeader();
     if (url.empty()) {
         throw RedditError("Given url is empty.");
     }

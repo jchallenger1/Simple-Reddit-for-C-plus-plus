@@ -19,6 +19,7 @@
 
 #include "MethodAccount.hpp"
 #include "MethodListing.hpp"
+#include "MethodSearch.hpp"
 #include "MethodObserver.hpp"
 #include "Method.hpp"
 

@@ -5,6 +5,7 @@
 
 #include "Curl.hpp"
 #include "json.hpp"
+#include "RedditUser.hpp"
 
 namespace redd {
 
@@ -27,9 +28,15 @@ protected:
 
     void checkJsonErrors(const nlohmann::json& json) const;
     void strToJson(const std::string& src, nlohmann::json& json) const;
+    inline void setToken(const RedditUser&);
 };
 
-
+inline void Method::setToken(const RedditUser& user) {
+    if (!user.isComplete()) {
+        throw RedditError("RedditUser must be complete");
+    }
+    curl->setHttpHeader("Authorization: bearer " + user.token());
+}
 
 
 }//! detail namespace

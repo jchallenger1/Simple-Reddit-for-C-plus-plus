@@ -45,7 +45,6 @@ private:
     std::unique_ptr<Inputs> extra_inputs;
 
     std::string inputsToString() const;
-    inline void setToken(const RedditUser&);
 };
 
 struct MethodListing::Inputs {

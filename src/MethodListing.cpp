@@ -19,7 +19,6 @@ MethodListing::MethodListing(const detail::Method& m) : extra_inputs(std::make_u
 
 
 Link MethodListing::by_id(const RedditUser& user, const std::string& fullname) {
-    curl->emptyHttpHeader();
     setToken(user);
     std::string url("https://oauth.reddit.com/by_id/" + fullname);
     std::string unparsed = curl->simpleGet(url);
@@ -37,7 +36,6 @@ Link MethodListing::by_id(const RedditUser& user, const std::string& fullname) {
 
 PostCommentPair MethodListing::commentTree
     (const RedditUser& user, const std::string& subreddit, const std::string& id) {
-    curl->emptyHttpHeader();
     setToken(user);
     PostCommentPair tree;
     RedditUrl url("https://oauth.reddit.com/r/" + subreddit + "/comments/" + id);
@@ -54,7 +52,6 @@ PostCommentPair MethodListing::commentTree
 }
 
 PostCommentPair MethodListing::random(const RedditUser& user, const std::string& s) {
-    curl->emptyHttpHeader();
     setToken(user);
     PostCommentPair random;
     std::string url("https://oauth.reddit.com/r/" + s + "/random");
@@ -71,7 +68,6 @@ PostCommentPair MethodListing::random(const RedditUser& user, const std::string&
 }
 
 std::vector<Link> MethodListing::duplicates(const RedditUser& user, const std::string& id) {
-    curl->emptyHttpHeader();
     setToken(user);
     RedditUrl url("https://oauth.reddit.com/duplicates/" + id);
     std::string query_strings = inputsToString();
@@ -96,7 +92,6 @@ std::vector<Link> MethodListing::duplicates(const RedditUser& user, const std::s
 }
 
 T3Listing MethodListing::hot(const RedditUser& user, const std::string& s) {
-    curl->emptyHttpHeader();
     setToken(user);
     RedditUrl url("https://oauth.reddit.com/r/" + s + "/hot");
     std::string query_strings = inputsToString();
@@ -115,7 +110,6 @@ T3Listing MethodListing::hot(const RedditUser& user, const std::string& s) {
 }
 
 T3Listing MethodListing::_new(const RedditUser& user, const std::string& s) {
-    curl->emptyHttpHeader();
     setToken(user);
     RedditUrl url("https://oauth.reddit.com/r/" + s + "/new");
     std::string query_strings = inputsToString();
@@ -133,7 +127,6 @@ T3Listing MethodListing::_new(const RedditUser& user, const std::string& s) {
 }
 
 T3Listing MethodListing::top(const RedditUser &user , const std::string &s) {
-    curl->emptyHttpHeader();
     setToken(user);
     RedditUrl url("https://oauth.reddit.com/r/" + s + "/top");
     std::string query_strings = inputsToString();
@@ -151,7 +144,6 @@ T3Listing MethodListing::top(const RedditUser &user , const std::string &s) {
 }
 
 T3Listing MethodListing::controversial(const RedditUser& user, const std::string& s) {
-    curl->emptyHttpHeader();
     setToken(user);
     RedditUrl url("https://oauth.reddit.com/r/" + s + "/controversial");
     std::string query_strings = inputsToString();
@@ -169,7 +161,6 @@ T3Listing MethodListing::controversial(const RedditUser& user, const std::string
 }
 
 T3Listing MethodListing::rising(const RedditUser& user, const std::string& s) {
-    curl->emptyHttpHeader();
     setToken(user);
     RedditUrl url("https://oauth.reddit.com/r/" + s + "/rising");
     std::string query_strings = inputsToString();
@@ -252,14 +243,6 @@ MethodListing::Inputs& MethodListing::inputs() {
 
 void MethodListing::resetInputs() {
     *extra_inputs = Inputs();
-}
-
-// function changes the curl object in this by adding a header
-inline void MethodListing::setToken(const RedditUser& user) {
-    if (!user.isComplete()) {
-        throw RedditError("RedditUser must be complete");
-    }
-    curl->setHttpHeader("Authorization: bearer " + user.token());
 }
 
 

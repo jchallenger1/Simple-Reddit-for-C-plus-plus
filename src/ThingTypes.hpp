@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "json.hpp"
+
 namespace redd {
 
 struct Comment; // type prefix for T1
