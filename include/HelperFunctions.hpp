@@ -54,7 +54,7 @@ using is_all_base_of = all_<std::is_base_of<T, Args>...>;
  * wrapper for nhloman::basic_json::value function.
 */
 template<typename O, typename J, typename K, typename D>
-constexpr auto setIfNotNull(O&& output, const J& json_obj, K&& key_name, D&& default_value)
+auto setIfNotNull(O&& output, const J& json_obj, K&& key_name, D&& default_value)
 -> decltype(json_obj.value(key_name, default_value), json_obj.find(key_name), void()) {
     auto n = json_obj.find(key_name);
     if (n != json_obj.end()) {

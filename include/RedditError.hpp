@@ -10,9 +10,8 @@ namespace redd {
 class RedditError : public std::runtime_error {
 public:
 
-    template<typename T = const char *, typename G = const char*, typename H = const char*>
-    explicit RedditError(T&& a = "", G&& b = "", H&& c = "") : std::runtime_error(std::forward<T>(a)),
-        curl_msg(std::forward<G>(b)), server_msg(std::forward<H>(c)) {}
+    explicit RedditError(const std::string& a = "", const std::string& b = "", const std::string& c = "") :
+ std::runtime_error(a), curl_msg(b), server_msg(c) {}
 
 
     std::string curl_what() const noexcept { return curl_msg; }
