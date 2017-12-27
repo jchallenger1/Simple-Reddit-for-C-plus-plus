@@ -1,3 +1,0 @@
-## Todo : Create two makefiles
-# One makefile will make a dynamic library
-# The other will make a static library
