@@ -2,7 +2,12 @@
 #include <string>
 #include <vector>
 #include <iomanip>
-#include "src/Reddit.hpp"
+
+#include "RedditUser.hpp"
+#include "RedditError.hpp"
+#include "MethodListing.hpp"
+#include "ThingTypes.hpp"
+
 using namespace redd;
 
 // Example of MethodListing::random and MethodListing::by_id
@@ -14,16 +19,15 @@ using namespace redd;
 int main() {
     // Get the user token, expires in 1 hr
     RedditUser user("Username","Password","clientID","clientSecret");
-    RedditSimpleClient client;
+	MethodListing listing;
     try {
-        user.setToken(client.requestToken(user));
+        user.setToken(listing.requestToken(user));
     } catch(RedditError& err) {
         std::cerr << err << std::endl;
     }
 
     std::string id;
-    MethodListing listing;
-    MethodListing::PostCommentPair pair = listing.random(user, "all");
+    ThingTypes::PostCommentPair pair = listing.random(user, "all");
     // print random's body text.
     std::cout << pair.link.selftext << std::endl;
 

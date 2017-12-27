@@ -1,7 +1,13 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "src/Reddit.hpp"
+
+#include "RedditUser.hpp"
+#include "RedditError.hpp"
+#include "MethodListing.hpp"
+#include "ThingTypes.hpp"
+
+
 using namespace redd;
 
 // Example of MethodListing::duplicates
@@ -13,9 +19,9 @@ using namespace redd;
 int main() {
     // Get the user token, expires in 1 hr
     RedditUser user("Username","Password","clientID","clientSecret");
-    RedditSimpleClient client;
+    MethodListing listing;
     try {
-        user.setToken(client.requestToken(user));
+        user.setToken(listing.requestToken(user));
     } catch(RedditError& err) {
         std::cerr << err << std::endl;
     }
@@ -26,17 +32,16 @@ int main() {
     MethodListing::Inputs inputs;
     inputs.limit = 10;
     inputs.t = "all";
-    MethodListing listing;
     listing.setInputs(inputs);
     // get the top post from funny
-    MethodListing::T3Listing pair = listing.top(user, "funny");
+    ThingTypes::T3Listing pair = listing.top(user, "funny");
     if (!pair.links.empty()) {
         id = pair.links[0].id;
         title = pair.links[0].title;
     }
 
     // get duplicates
-    std::vector<MethodListing::Link> duplicates = listing.duplicates(user, id);
+    std::vector<ThingTypes::Link> duplicates = listing.duplicates(user, id);
     std::cout << title << " has " << duplicates.size() - 1 << " duplicate posts" << std::endl;
     return 0;
 }

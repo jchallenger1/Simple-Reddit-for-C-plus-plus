@@ -3,6 +3,12 @@
 #include <vector>
 #include <algorithm>
 #include "src/Reddit.hpp"
+
+#include "RedditUser.hpp"
+#include "RedditError.hpp"
+#include "MethodListing.hpp"
+#include "ThingTypes.hpp"
+
 using namespace redd;
 
 // Example of MethodListing::hot, new, top, controversial and rising
@@ -16,21 +22,21 @@ using namespace redd;
 int main() {
     // Get the user token, expires in 1 hr
     RedditUser user("Username","Password","clientID","clientSecret");
-    RedditSimpleClient client;
+	MethodListing listing;
     try {
-        user.setToken(client.requestToken(user));
+        user.setToken(listing.requestToken(user));
     } catch(RedditError& err) {
         std::cerr << err << std::endl;
     }
 
-    MethodListing listing;
+    
     MethodListing::Inputs& inputs = listing.inputs(); // <- note the reference.
     std::string after;
-    std::vector<MethodListing::Link> list;
+    std::vector<ThingTypes::Link> list;
 
     while (list.size() < 80) {
         inputs.after = after; // set the posting to the 'next page'
-        MethodListing::T3Listing item = listing._new(user, "pics");
+        ThingTypes::T3Listing item = listing._new(user, "pics");
         if (list.size() == 0) {
             list.assign(item.links.begin(), item.links.end());
             after = item.after; // set the after id.
@@ -41,7 +47,7 @@ int main() {
         }
     }
 
-    for (MethodListing::Link& n : list) { // print out the urls
+    for (ThingTypes::Link& n : list) { // print out the urls
         std::cout << n.url << std::endl;
     }
 

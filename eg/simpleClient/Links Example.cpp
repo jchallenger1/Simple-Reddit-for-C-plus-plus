@@ -2,8 +2,9 @@
 #include <string>
 #include <vector>
 
+#include "RedditSimpleClient.hpp"
+#include "RedditSub.hpp"
 
-#include "Reddit.hpp"
 using namespace redd;
 
 int main() {
